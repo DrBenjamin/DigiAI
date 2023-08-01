@@ -1,92 +1,57 @@
 import streamlit as st
 import os
+import io
+import pandas as pd
+import openai
+import xlsxwriter
+import openpyxl
+import xlrd
 import PyPDF2
 
 
+
+
+#### Functions
 ### Function: export_excel = Pandas dataframe to MS Excel Makro File (xlsm)
-def export_excel(sheet, column, columns, length, data,
-                 sheet2 = 'N0thing', column2 = 'A', columns2 = '', length2 = '', data2 = '',
-                 sheet3 = 'N0thing', column3 = 'A', columns3 = '', length3 = '', data3 = '',
-                 sheet4 = 'N0thing', column4 = 'A', columns4 = '', length4 = '', data4 = '',
-                 sheet5 = 'N0thing', column5 = 'A', columns5 = '', length5 = '', data5 = '',
-                 sheet6 = 'N0thing', column6 = 'A', columns6 = '', length6 = '', data6 = '',
-                 sheet7 = 'N0thing', column7 = 'A', columns7 = '', length7 = '', data7 = '',
-                 image = 'NoImage', image_pos = 'D1', excel_file_name = 'Export.xlsm'):
-
-
-    ## Store fuction arguments in array
-    # Create empty array
-    func_arr = []
-
-    # Add function arguments to array
-    func_arr.append([sheet, column, columns, length, data])
-    func_arr.append([sheet2, column2, columns2, length2, data2])
-    func_arr.append([sheet3, column3, columns3, length3, data3])
-    func_arr.append([sheet4, column4, columns4, length4, data4])
-    func_arr.append([sheet5, column5, columns5, length5, data5])
-    func_arr.append([sheet6, column6, columns6, length6, data6])
-    func_arr.append([sheet7, column7, columns7, length7, data7])
-
-
-    ## Create an Excel file filled with a pandas dataframe using XlsxWriter as engine
+def export_excel(sheet, data, excel_file_name = 'Digital_Landscape_GIZ.xlsm'):
+    # Create an Excel file filled with a pandas dataframe using XlsxWriter as engine
     buffer = io.BytesIO()
     with pd.ExcelWriter(buffer, engine = 'xlsxwriter') as writer:
-        for i in range(7):
-            if (func_arr[i][0] != 'N0thing'):
-                # Add dataframe data to worksheet
-                func_arr[i][4].to_excel(writer, sheet_name = func_arr[i][0], index = False)
+        # Add dataframe data to worksheet
+        data.to_excel(writer, sheet_name = sheet, index = False)
 
-                # Define worksheet
-                worksheet = writer.sheets[func_arr[i][0]]
+        # Define worksheet
+        worksheet = writer.sheets[sheet]
 
-                # Add a table to the worksheet
-                if func_arr[i][1] != 'A':
-                    span = "A1:%s%s" % (func_arr[i][1], func_arr[i][3])
-                    worksheet.add_table(span, {'columns': func_arr[i][2]})
-                    range_table = "A:" + func_arr[i][1]
-                    worksheet.set_column(range_table, 30)
+        # Add a table to the worksheet
+        #span = "A1:A2"
+        #worksheet.add_table(span, {'columns': columns})
+        range_table = "A:A"
+        worksheet.set_column(range_table, 30)
 
-                # Add image to worksheet
-                if (image != 'NoImage'):
-                    # Saving image as png to a buffer
-                    # byteIO = io.BytesIO()
-                    # image.save(byteIO, format = 'PNG')
-                    # pic = byteIO.getvalue()
-
-                    # Saving image as png temp file
-                    f = open('files/temp.png', 'wb')
-                    f.write(image)
-                    f.close()
-
-                    # Insert in worksheet
-                    worksheet.insert_image(image_pos, 'files/temp.png')
-
-
-        ## Add Excel VBA code
+        # Add Excel VBA code
         workbook = writer.book
-        workbook.add_vba_project('files/vbaProject.bin')
+        workbook.add_vba_project('vbaProject.bin')
 
-
-        ## Saving changes
+        # Saving changes
         workbook.close()
-        writer.save()
+        writer.close()
 
-
-        ## Download Button
+        # Download Button
         st.download_button(label = 'Download Excel document', data = buffer, file_name = excel_file_name,
                            mime = "application/vnd.ms-excel.sheet.macroEnabled.12")
 
 
 
 
-#### Header
+#### Main App
 st.header("Digitalization Advisor")
 st.subheader('What is your project / approach about?')
 st.write("Welcome to the Digitalization Advisor. This tool will help you to identify the best digitalization initiatives in GIZ to support your individual project. Please answer the following questions to get started.")
 
 st.checkbox("The project is with a partner organisation")
-input_text = ""
-input_text = st.text_area("What is your project about?")
+input_text = '"""'
+input_text += st.text_area("What is your project about (also add keywords to describe your project)?")
 st.write("... you can also upload a describing PDF file (also in addition to the text above)")
 
 # Upload PDF file
@@ -98,12 +63,34 @@ if uploaded_file is not None:
     file.close()
     
 # Extact text from PDF document
-reader = PyPDF2.PdfReader(file_name)
-for i in range(len(reader.pages)):
-    input_text += reader.pages[i].extract_text()
+try:
+    reader = PyPDF2.PdfReader(file_name)
+    reader_text = ""
+    for i in range(len(reader.pages)):
+        reader_text += reader.pages[i].extract_text()
+    reader_text = reader_text.replace('\n', ' ')
+except:
+    print('No PDF file uploaded')
 
 # Download Excel file
 submitted = st.button("Submit")
 if submitted:
-    st.write("Thank you for your submission. Download your personalized Excel document.")
-    st.text_area("Your project description", input_text)
+    st.write("Thank you for your submission. Your Excel document is in preparation...")
+    
+    # Using ChatGPT from OpenAI to shorten PDF extracted text
+    # Set API key
+    openai.api_key = st.secrets['openai']['key']
+                
+    # Doing the requests to OpenAI for summarizing / keyword extracting the question
+    try:
+        # Creating summary of user question
+        model = 'gpt-3.5-turbo'
+        response_summary = openai.ChatCompletion.create(model = model, messages = [{"role": "system", "content": "You do summarization."}, {"role": "user", "content": reader_text[:3000]},])
+        summary_text = response_summary['choices'][0]['message']['content'].lstrip()
+        summary_text = summary_text.replace('\n', ' ')
+        input_text += " " + summary_text
+    except:
+        print('ChatGPT failed')
+    input_text += '"""'
+    st.write('Download your personalized Excel document.')
+    export_excel(sheet = 'Project Description', data = pd.DataFrame([input_text]))

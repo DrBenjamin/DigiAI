@@ -1,3 +1,8 @@
+# My stuff
+secrets.toml
+PDFs\*.pdf
+vba_extract.py
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
