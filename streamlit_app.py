@@ -12,22 +12,25 @@ import PyPDF2
 
 
 #### Functions
+### Function: import_excel = Read pandas dataframe from MS Excel document (xlsx)
+def import_excel(excel_file_name = 'Excel/Digital_Landscape_GIZ_List.xlsx'):
+    try:
+        df = pd.read_excel(excel_file_name)
+        return df
+    except FileNotFoundError:
+        print(f"File '{excel_file_name}' not found.")
+
+
+
 ### Function: export_excel = Pandas dataframe to MS Excel Makro File (xlsm)
-def export_excel(sheet, data, excel_file_name = 'Digital_Landscape_GIZ.xlsm'):
+def export_excel(sheet, data, sheet2, keywords, sheet3, landscape, excel_file_name = 'Digital_Landscape_GIZ.xlsm'):
     # Create an Excel file filled with a pandas dataframe using XlsxWriter as engine
     buffer = io.BytesIO()
     with pd.ExcelWriter(buffer, engine = 'xlsxwriter') as writer:
-        # Add dataframe data to worksheet
+        # Add data to worksheet
         data.to_excel(writer, sheet_name = sheet, index = False)
-
-        # Define worksheet
-        worksheet = writer.sheets[sheet]
-
-        # Add a table to the worksheet
-        #span = "A1:A2"
-        #worksheet.add_table(span, {'columns': columns})
-        range_table = "A:A"
-        worksheet.set_column(range_table, 30)
+        keywords.to_excel(writer, sheet_name = sheet2, index = False)
+        landscape.to_excel(writer, sheet_name = sheet3, index = False)
 
         # Add Excel VBA code
         workbook = writer.book
@@ -48,11 +51,11 @@ def export_excel(sheet, data, excel_file_name = 'Digital_Landscape_GIZ.xlsm'):
 st.header("Digitalization Advisor")
 st.subheader('What is your project / approach about?')
 st.write("Welcome to the Digitalization Advisor. This tool will help you to identify the best digitalization initiatives in GIZ to support your individual project. Please answer the following questions to get started.")
-
-st.checkbox("The project is with a partner organisation")
 input_text = '"""'
-input_text += st.text_area("What is your project about (also add keywords to describe your project)?")
-st.write("... you can also upload a describing PDF file (also in addition to the text above)")
+input_text += st.text_area("What is your digitalization project about?")
+input_keywords = ''
+input_keywords = st.text_area("What are the keywords of your digitalization project?")
+st.write("... you can also upload a describing PDF file (in addition to the information above)")
 
 # Upload PDF file
 uploaded_file = st.file_uploader(label = 'Choose a PDF file to upload', type = 'pdf')
@@ -81,7 +84,7 @@ if submitted:
     # Set API key
     openai.api_key = st.secrets['openai']['key']
                 
-    # Doing the requests to OpenAI for summarizing / keyword extracting the question
+    # Doing the requests to OpenAI for summarizing
     try:
         # Creating summary of user question
         model = 'gpt-3.5-turbo'
@@ -90,7 +93,19 @@ if submitted:
         summary_text = summary_text.replace('\n', ' ')
         input_text += " " + summary_text
     except:
-        print('ChatGPT failed')
+        print('ChatGPT summarization failed')
     input_text += '"""'
+
+    # Doing the requests to OpenAI for keyword extracting
+    try:
+        # Extracting keywords
+        model = 'gpt-3.5-turbo'
+        response_keywords = openai.ChatCompletion.create(model = model, messages = [{"role": "system", "content": "You do keyword extraction."}, {"role": "user", "content": input_text},])
+        keywords = response_keywords['choices'][0]['message']['content'].lstrip()
+        input_keywords += ", " + keywords
+    except:
+        print('ChatGPT keyword extraction failed')
+    st.write(input_keywords)
+
     st.write('Download your personalized Excel document.')
-    export_excel(sheet = 'Project Description', data = pd.DataFrame([input_text]))
+    export_excel(sheet = 'Project description', data = pd.DataFrame([input_text]), sheet2 = 'Project keywords', keywords = pd.DataFrame([input_keywords]), sheet3 = 'Digital landscape GIZ', landscape = import_excel())
