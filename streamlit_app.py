@@ -11,9 +11,16 @@ import PyPDF2
 
 
 
+#### Session states
+if 'version' is not st.session_state:
+    st.session_state['version'] = 'V1.0'
+
+
+
+
 #### Functions
 ### Function: import_excel = Read pandas dataframe from MS Excel document (xlsx)
-def import_excel(excel_file_name = 'Excel/Digital_Landscape_GIZ_List.xlsx'):
+def import_excel(excel_file_name):
     try:
         df = pd.read_excel(excel_file_name)
         return df
@@ -49,8 +56,26 @@ def export_excel(sheet, data, sheet2, keywords, sheet3, landscape, excel_file_na
 
 #### Main App
 st.header("Digitalization Advisor")
-st.subheader('What is your project / approach about?')
+st.subheader('Get help to find support in GIZ for your digitalization project')
 st.write("Welcome to the Digitalization Advisor. This tool will help you to identify the best digitalization initiatives in GIZ to support your individual project. Please answer the following questions to get started.")
+
+# Upload Excel file
+uploaded_file = st.file_uploader(label = 'Do you want to upload a new Digital landscape GIZ file version?', type = 'xlsx')
+if uploaded_file is not None:
+    file_name = os.path.join('Excel', uploaded_file.name)
+    file = open(file_name, 'wb')
+    file.write(uploaded_file.getvalue())
+    file.close()
+
+# Get a list of files in a folder
+filez = os.listdir('Excel/')
+versions = []
+for file in filez:
+    if file[:27] == 'Digital_Landscape_GIZ_List_' and file[-5:] == '.xlsx':
+        versions.append(file[27:31])
+st.session_state['version'] = st.selectbox(label = "Which Digital landscape GIZ file version should be used?", options = versions, disabled = False)
+
+# User Input
 input_text = '"""'
 input_text += st.text_area("What is your digitalization project about?")
 input_keywords = ''
@@ -58,7 +83,7 @@ input_keywords = st.text_area("What are the keywords of your digitalization proj
 st.write("... you can also upload a describing PDF file (in addition to the information above)")
 
 # Upload PDF file
-uploaded_file = st.file_uploader(label = 'Choose a PDF file to upload', type = 'pdf')
+uploaded_file = st.file_uploader(label = 'Do you want to upload a PDF file with more information about your project?', type = 'pdf')
 if uploaded_file is not None:
     file_name = os.path.join('PDFs', uploaded_file.name)
     file = open(file_name, 'wb')
@@ -105,7 +130,6 @@ if submitted:
         input_keywords += ", " + keywords
     except:
         print('ChatGPT keyword extraction failed')
-    st.write(input_keywords)
 
     st.write('Download your personalized Excel document.')
-    export_excel(sheet = 'Project description', data = pd.DataFrame([input_text]), sheet2 = 'Project keywords', keywords = pd.DataFrame([input_keywords]), sheet3 = 'Digital landscape GIZ', landscape = import_excel())
+    export_excel(sheet = 'Project description', data = pd.DataFrame([input_text]), sheet2 = 'Project keywords', keywords = pd.DataFrame([input_keywords]), sheet3 = 'Digital landscape GIZ', landscape = import_excel(excel_file_name = 'Excel/Digital_Landscape_GIZ_List_' + st.session_state['version'] + '.xlsx'))
