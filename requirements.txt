@@ -1,0 +1,13 @@
+##### `requirements.txt`
+##### DigiAI
+##### Open-Source, hosted on https://github.com/DrBenjamin/DigiAI
+##### Please reach out to ben@benbox.org for any questions
+### All needed libraries (and their versions)
+streamlit==1.25.0
+opencv-python-headless
+xlsxwriter
+openpyxl
+xlrd
+openai
+pygsheets
+PyPDF2
