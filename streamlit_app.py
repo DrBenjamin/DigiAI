@@ -46,8 +46,7 @@ def export_excel(sheet, data, sheet2, keywords, sheet3, landscape, excel_file_na
         data.to_excel(writer, sheet_name = sheet, index = False)
         keywords.to_excel(writer, sheet_name = sheet2, index = False)
         landscape.to_excel(writer, sheet_name = sheet3, index = False)
-        image_sheet = pd.DataFrame([st.session_state['font_color']])
-        image_sheet.to_excel(writer, sheet_name = "Wallpaper", index = False)
+        pd.DataFrame([st.session_state['font_color']]).to_excel(writer, sheet_name = "Wallpaper", index = False)
 
         # Add image to worksheet
         worksheet = writer.sheets['Wallpaper']
