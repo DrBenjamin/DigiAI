@@ -1,3 +1,8 @@
+##### `streamlit_app.py`
+##### DigiAI
+##### Open-Source, hosted on https://github.com/DrBenjamin/DigiAI
+##### Please reach out to ben@benbox.org for any questions
+#### Loading needed Python libraries
 import streamlit as st
 import os
 import io
