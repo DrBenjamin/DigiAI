@@ -18,9 +18,9 @@ from PIL import Image
 
 
 #### Session states
-if 'version' is not st.session_state:
+if 'version' not in st.session_state:
     st.session_state['version'] = 'V1.0'
-if 'font_color' is not st.session_state:
+if 'font_color' not in st.session_state:
     st.session_state['font_color'] = 'vbWhite'
 
 

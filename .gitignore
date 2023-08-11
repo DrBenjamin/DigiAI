@@ -2,6 +2,9 @@
 secrets.toml
 PDFs\*.pdf
 vba_extract.py
+Images/*.jpg
+Temp.jpg
+test.xlsm
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -163,6 +166,3 @@ cython_debug/
 #  and can be added to the global gitignore or merged into this file.  For a more nuclear
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 #.idea/
-Images/temp.jpg
-PDFs/MGHP3_ProgressReport.pdf
-Digital_Landscape_GIZ.xlsm
