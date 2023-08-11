@@ -4,6 +4,7 @@
 ##### Please reach out to ben@benbox.org for any questions
 ### All needed libraries (and their versions)
 streamlit==1.25.0
+xlwings==0.30.10
 opencv-python-headless
 xlsxwriter
 openpyxl
