@@ -56,7 +56,7 @@ Private Sub Workbook_Open()
             Hits = Y
         End If
     Next Y
-    Debug.Print "Position: " & Hits & " Value: " & arr_landscape(Hits, 14)
+    Debug.Print "Position: " & Hits & " Initiative: " & arr_landscape(Hits, 1) & " Value: " & arr_landscape(Hits, 14)
 
     ' Show UserForm
     With UserForm1
