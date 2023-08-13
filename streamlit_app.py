@@ -66,7 +66,7 @@ def export_excel(sheet, data, sheet2, keywords, sheet3, landscape, excel_file_na
 
         # Add Excel VBA code
         workbook = writer.book
-        workbook.add_vba_project('vbaProject.bin')
+        workbook.add_vba_project('Excel/vbaProject.bin')
 
         # Saving changes
         workbook.close()

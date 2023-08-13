@@ -48,7 +48,7 @@ Sub Test()
         Next X
     Next Y
     
-    ' Getting highest hit
+    ' Getting the initiative with the most keyword matches
     Hits = 1
     For Y = 1 To 51
         If Int(arr_landscape(Y, 14)) > Int(arr_landscape(Hits, 14)) Then
