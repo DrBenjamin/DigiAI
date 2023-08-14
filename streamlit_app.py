@@ -6,6 +6,9 @@
 import streamlit as st
 import os
 import io
+import sys
+from zipfile import ZipFile
+from zipfile import BadZipfile
 import pandas as pd
 import openai
 import xlsxwriter
@@ -27,6 +30,45 @@ if 'font_color' not in st.session_state:
 
 
 #### Functions
+### Function: extract_macro = Extract VBA code from MS Excel document (xlsm)
+def extract_macro(xlsm_file = 'Excel/Digital_Landscape_GIZ.xlsm', vba_filename = 'vbaProject.bin'):
+    try:
+        # Open the Excel xlsm file as a zip file.
+        xlsm_zip = ZipFile(xlsm_file, 'r')
+
+        # Read the xl/vbaProject.bin file.
+        vba_data = xlsm_zip.read('xl/' + vba_filename)
+
+        # Write the vba data to a local file.
+        vba_file = open('Excel/' + vba_filename, "wb")
+        vba_file.write(vba_data)
+        vba_file.close()
+
+    except IOError as e:
+        print("File error: %s" % str(e))
+        exit()
+
+    except KeyError as e:
+        # Usually when there isn't a xl/vbaProject.bin member in the file.
+        print("File error: %s" % str(e))
+        print("File may not be an Excel xlsm macro file: '%s'" % xlsm_file)
+        exit()
+
+    except BadZipfile as e:
+        # Usually if the file is a xls file and not a xlsm file.
+        print("File error: %s: '%s'" % (str(e), xlsm_file))
+        print("File may not be an Excel xlsm macro file.")
+        exit()
+
+    except Exception as e:
+        # Catch any other exceptions.
+        print("File error: %s" % str(e))
+        exit()
+
+    print("Extracted: %s" % vba_filename)
+
+
+
 ### Function: import_excel = Read pandas dataframe from MS Excel document (xlsx)
 def import_excel(excel_file_name):
     try:
@@ -142,34 +184,35 @@ except:
 # Download Excel file
 submitted = st.button("Submit")
 if submitted:
-    st.write("Thank you for your submission. Your Excel document is in preparation...")
-    
-    # Using ChatGPT from OpenAI to shorten PDF extracted text
-    # Set API key
-    openai.api_key = st.secrets['openai']['key']
-                
-    # Doing the requests to OpenAI for summarizing
-    try:
-        # Creating summary of user question
-        model = 'gpt-3.5-turb'
-        response_summary = openai.ChatCompletion.create(model = model, messages = [{"role": "system", "content": "You do summarization."}, {"role": "user", "content": reader_text[:3000]},])
-        summary_text = response_summary['choices'][0]['message']['content'].lstrip()
-        summary_text = summary_text.replace('\n', ' ')
-        input_text += " " + summary_text
-    except:
-        print('ChatGPT summarization failed')
-    input_text += '"""'
+    st.write("Thank you for your submission.")
+    with st.spinner('Wait for your Excel document...'):
+        ## Using ChatGPT from OpenAI to shorten PDF extracted text
+        # Set API key
+        openai.api_key = st.secrets['openai']['key']
+                    
+        # Doing the requests to OpenAI for summarizing
+        model = 'gpt-3.5-turbo'
+        try:
+            # Creating summary of user question
+            response_summary = openai.ChatCompletion.create(model = model, messages = [{"role": "system", "content": "You do summarization."}, {"role": "user", "content": reader_text[:3000]},])
+            summary_text = response_summary['choices'][0]['message']['content'].lstrip()
+            summary_text = summary_text.replace('\n', ' ')
+            input_text += " " + summary_text
+        except:
+            print('ChatGPT summarization failed')
+        input_text += '"""'
 
-    # Doing the requests to OpenAI for keyword extracting
-    try:
-        # Extracting keywords
-        model = 'gpt-3.5-turb'
-        response_keywords = openai.ChatCompletion.create(model = model, messages = [{"role": "system", "content": "You do keyword extraction."}, {"role": "user", "content": input_text},])
-        keywords = response_keywords['choices'][0]['message']['content'].lstrip()
-        input_keywords += ", " + keywords
-    except:
-        print('ChatGPT keyword extraction failed')
+        # Doing the requests to OpenAI for keyword extracting
+        try:
+            # Extracting keywords
+            response_keywords = openai.ChatCompletion.create(model = model, messages = [{"role": "system", "content": "You do keyword extraction."}, {"role": "user", "content": input_text},])
+            keywords = response_keywords['choices'][0]['message']['content'].lstrip()
+            input_keywords += ", " + keywords
+        except:
+            print('ChatGPT keyword extraction failed')
 
-    # Export Excel file
-    export_excel(sheet = 'Project description', data = pd.DataFrame([input_text]), sheet2 = 'Project keywords', keywords = pd.DataFrame([input_keywords]), sheet3 = 'Digital landscape GIZ', landscape = import_excel(excel_file_name = 'Excel/Digital_Landscape_GIZ_List_' + st.session_state['version'] + '.xlsx'), image = Image.open(excel_image))
+
+        ## Export Excel file
+        extract_macro()
+        export_excel(sheet = 'Project description', data = pd.DataFrame([input_text]), sheet2 = 'Project keywords', keywords = pd.DataFrame([input_keywords]), sheet3 = 'Digital landscape GIZ', landscape = import_excel(excel_file_name = 'Excel/Digital_Landscape_GIZ_List_' + st.session_state['version'] + '.xlsx'), image = Image.open(excel_image))
     st.toast("Your Excel document is ready for download.", icon = "👍")
