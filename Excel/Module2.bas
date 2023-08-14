@@ -58,9 +58,7 @@ Sub Test()
     Debug.Print "Position: " & Hits & " Initiative: " & arr_landscape(Hits, 1) & " Value: " & arr_landscape(Hits, 14)
     
     ' Create HeatMap
-    ' Dim dsout As New cDataSet
 
-    ' createSurfaceChart dsout.populateData(wholeSheet("matrixout"), , "matrixout", True, , , True, "matrix"), "heatmap"
 
     ' Show UserForm
     With UserForm1
