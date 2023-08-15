@@ -22,36 +22,11 @@ Private Sub CreateHeatmap_Click()
     Dim chartObj As ChartObject
     
     ' Create Heat Map
-    ' For Y = 1 To 51
-    '     For X = 1 To 13
-    '         Worksheets("Heat Map").Cells(Y, X).Value = arr_landscape(Y, X)
-    '     Next X
-    ' Next Y
-
-    ' Set data range
-    Set dataRange = Range("A1:C5")
-    
-    ' Set chart range
-    Set chartRange = Range("E1:H5")
-    
-    ' Create chart object
-    Set chartObj = ActiveSheet.ChartObjects.Add(Left:=chartRange.Left, Top:=chartRange.Top, Width:=chartRange.Width, Height:=chartRange.Height)
-    
-    ' Set chart type to heatmap
-    chartObj.Chart.ChartType = xlHeatmap
-    
-    ' Set chart data source
-    chartObj.Chart.SetSourceData Source:=dataRange
-    
-    ' Set chart title
-    chartObj.Chart.HasTitle = True
-    chartObj.Chart.ChartTitle.Text = "Heatmap"
-    
-    ' Set chart axis titles
-    chartObj.Chart.Axes(xlCategory).HasTitle = True
-    chartObj.Chart.Axes(xlCategory).AxisTitle.Text = "X Axis"
-    chartObj.Chart.Axes(xlValue).HasTitle = True
-    chartObj.Chart.Axes(xlValue).AxisTitle.Text = "Y Axis"
+    For Y = 1 To 51
+        For X = 1 To 13
+            Worksheets("Heat Map").Cells(Y, X).Value = arr_landscape(Y, X)
+        Next X
+    Next Y
 
     ' Hide UserForm
     UserForm1.Hide

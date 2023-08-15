@@ -2,7 +2,7 @@ VERSION 1.0 CLASS
 BEGIN
   MultiUse = -1  'True
 END
-Attribute VB_Name = "Class1"
+Attribute VB_Name = "WorkbookOpenHandler"
 Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
@@ -15,7 +15,6 @@ Private Sub oApp_WorkbookActivate(ByVal wb As Workbook)
         bDeferredOpen = False
         Call WorkbookOpenHandler(wb)
     End If
-
 End Sub
 Private Sub oApp_WorkbookOpen(ByVal wb As Workbook)
     
@@ -31,10 +30,9 @@ Private Sub oApp_WorkbookOpen(ByVal wb As Workbook)
     Else
         bDeferredOpen = True
     End If
-
 End Sub
 Private Sub WorkbookOpenHandler(ByVal wb As Workbook)
-
+    ActiveWindow.DisplayHeadings = False
     Dim X As Integer, Y As Integer
     Dim pro As String
     Dim word As Variant
@@ -53,13 +51,13 @@ Private Sub WorkbookOpenHandler(ByVal wb As Workbook)
     'Assigning Digital landscape values as array
     For Y = 1 To 51
         For X = 1 To 13
-            arr_landscape(Y, X) = Worksheets("Digital landscape GIZ").Cells(Y + 1, X).Value
+            arr_landscape(Y, X) = Worksheets("Digital landscape GIZ").Cells(Y + 1, X).value
         Next X
         arr_landscape(Y, 14) = 0
     Next Y
     
     'Assigning keywords values as array
-    pro = Worksheets("Project keywords").Range("A2").Value
+    pro = Worksheets("Project keywords").Range("A2").value
     pro = Replace(pro, ".", "")
     project = Split(pro, ", ")
     
@@ -100,5 +98,5 @@ Private Sub WorkbookOpenHandler(ByVal wb As Workbook)
         .Top = Application.Top + (0.5 * Application.Height) - (0.5 * .Height)
         .Show
     End With
-
 End Sub
+

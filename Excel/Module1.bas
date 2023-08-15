@@ -1,5 +1,8 @@
 Attribute VB_Name = "Module1"
 Option Explicit
+Public bDeferredOpen As Boolean
+Public OpenHandler As WorkbookOpenHandler
+Public Const HANDLER_ENABLED = True
 Const API_KEY As String = "K3iE2nh1Rex94RBUPj0wJFkblB3TS6XPtImSpgzGyscKcAwH"
 Const API_ENDPOINT As String = "https://api.openai.com/v1/completions"
 Const MODELL As String = "text-davinci-003"
@@ -11,8 +14,6 @@ Global sentence As String
 Global project() As String
 Global Hits As Integer
 Global arr_len As Integer
-Public bDeferredOpen As Boolean
-Public OpenHandler As WorkbookOpenHandler
 Function RangeToString(ByVal myRange As Range) As String
     RangeToString = ""
     If Not myRange Is Nothing Then
