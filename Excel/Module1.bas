@@ -11,6 +11,8 @@ Global sentence As String
 Global project() As String
 Global Hits As Integer
 Global arr_len As Integer
+Public bDeferredOpen As Boolean
+Public OpenHandler As WorkbookOpenHandler
 Function RangeToString(ByVal myRange As Range) As String
     RangeToString = ""
     If Not myRange Is Nothing Then
