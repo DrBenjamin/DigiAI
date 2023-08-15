@@ -58,7 +58,7 @@ Sub Test()
     Debug.Print "Position: " & Hits & " Initiative: " & arr_landscape(Hits, 1) & " Value: " & arr_landscape(Hits, 14)
     
     ' Create HeatMap
-
+    
 
     ' Show UserForm
     With UserForm1

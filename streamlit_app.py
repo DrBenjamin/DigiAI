@@ -43,30 +43,29 @@ def extract_macro(xlsm_file = 'Excel/Digital_Landscape_GIZ.xlsm', vba_filename =
         vba_file = open('Excel/' + vba_filename, "wb")
         vba_file.write(vba_data)
         vba_file.close()
+        print("Extracted: %s" % vba_filename)
 
     except IOError as e:
         print("File error: %s" % str(e))
-        exit()
+        print("Not Extraced, using chached version.")
 
     except KeyError as e:
         # Usually when there isn't a xl/vbaProject.bin member in the file.
         print("File error: %s" % str(e))
         print("File may not be an Excel xlsm macro file: '%s'" % xlsm_file)
-        exit()
+        print("Not Extraced, using chached version.")
 
     except BadZipfile as e:
         # Usually if the file is a xls file and not a xlsm file.
         print("File error: %s: '%s'" % (str(e), xlsm_file))
         print("File may not be an Excel xlsm macro file.")
-        exit()
+        print("Not Extraced, using chached version.")
 
     except Exception as e:
         # Catch any other exceptions.
         print("File error: %s" % str(e))
-        exit()
-
-    print("Extracted: %s" % vba_filename)
-
+        print("Not Extraced, using chached version.")
+        
 
 
 ### Function: import_excel = Read pandas dataframe from MS Excel document (xlsx)
