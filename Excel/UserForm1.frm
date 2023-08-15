@@ -58,43 +58,36 @@ Private Sub UpdateButton_Click()
     Next l
 End Sub
 Sub SaveRangeAsPicture()
-'PURPOSE: Save a selected cell range as a JPG file to computer's desktop
-'SOURCE: www.thespreadsheetguru.com
+    ' Save a selected cell range as a JPG file to computer's desktop
+    Dim cht As ChartObject
+    Dim ActiveShape As Shape
 
-Dim cht As ChartObject
-Dim ActiveShape As Shape
-
-'Copy/Paste Cell Range as a Picture
-  Selection.Copy
-  ActiveSheet.Pictures.Paste(link:=False).Select
-  Set ActiveShape = ActiveSheet.Shapes(ActiveWindow.Selection.Name)
-  
-'Create a temporary chart object (same size as shape)
-  Set cht = ActiveSheet.ChartObjects.Add( _
-    Left:=ActiveCell.Left, _
-    Width:=ActiveShape.Width, _
-    Top:=ActiveCell.Top, _
-    Height:=ActiveShape.Height)
-
-'Format temporary chart to have a transparent background
-  cht.ShapeRange.Fill.Visible = msoFalse
-  cht.ShapeRange.Line.Visible = msoFalse
+    'Copy/Paste Cell Range as a Picture
+    Selection.Copy
+    ActiveSheet.Pictures.Paste(link:=False).Select
+    Set ActiveShape = ActiveSheet.Shapes(ActiveWindow.Selection.Name)
     
-'Copy/Paste Shape inside temporary chart
-  ActiveShape.Copy
-  cht.Activate
-  ActiveChart.Paste
-   
-'Save chart to User's Desktop as PNG File
-  cht.Chart.Export Environ("USERPROFILE") & "\Desktop\" & ActiveShape.Name & ".jpg"
+    'Create a temporary chart object (same size as shape)
+    Set cht = ActiveSheet.ChartObjects.Add(Left:=ActiveCell.Left, Width:=ActiveShape.Width, Top:=ActiveCell.Top, Height:=ActiveShape.Height)
 
-'Delete temporary Chart
-  cht.Delete
-  ActiveShape.Delete
+    'Format temporary chart to have a transparent background
+    cht.ShapeRange.Fill.Visible = msoFalse
+    cht.ShapeRange.Line.Visible = msoFalse
+        
+    'Copy/Paste Shape inside temporary chart
+    ActiveShape.Copy
+    cht.Activate
+    ActiveChart.Paste
+    
+    'Save chart to User's Desktop as PNG File
+    cht.Chart.Export Environ("USERPROFILE") & "\Desktop\" & ActiveShape.Name & ".jpg"
 
-'Re-Select Shape (appears like nothing happened!)
-  ActiveShape.Select
+    'Delete temporary Chart
+    cht.Delete
+    ActiveShape.Delete
 
+    'Re-Select Shape (appears like nothing happened!)
+    ActiveShape.Select
 End Sub
 Sub Pict(PicName)
     Dim Ans As String
