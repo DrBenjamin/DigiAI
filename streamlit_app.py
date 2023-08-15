@@ -65,7 +65,7 @@ def extract_macro(xlsm_file = 'Excel/Digital_Landscape_GIZ.xlsm', vba_filename =
         # Catch any other exceptions.
         print("File error: %s" % str(e))
         print("Not Extraced, using chached version.")
-        
+
 
 
 ### Function: import_excel = Read pandas dataframe from MS Excel document (xlsx)
@@ -139,7 +139,7 @@ versions = []
 for file in filez:
     if file[:27] == 'Digital_Landscape_GIZ_List_' and file[-5:] == '.xlsx':
         versions.append(file[27:31])
-st.session_state['version'] = st.selectbox(label = "Which Digital landscape GIZ file version should be used?", options = versions, disabled = False)
+st.session_state['version'] = st.selectbox(label = "Which Digital landscape GIZ file version should be used?", options = versions, index = len(versions) - 1, disabled = False)
 
 # Upload Wallpaper image
 uploaded_file = st.file_uploader(label = 'Do you want to upload a customized Wallpaper?', type = 'jpg')
@@ -151,7 +151,7 @@ if uploaded_file is not None:
     excel_image = file_name
     st.session_state['font_color'] = st.selectbox(label = "Which font color should be used?", options = ['Black', 'White'])
 else:
-    excel_image = 'Images/Africa_Digitalization.jpg'
+    excel_image = 'Images/Wallpaper.jpg'
     st.session_state['font_color'] = 'White'
 
 # User Input
