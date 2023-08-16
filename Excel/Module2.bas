@@ -1,5 +1,6 @@
 Attribute VB_Name = "Module2"
 Option Explicit
+' Test routine
 Sub Test()
     Dim X As Integer, Y As Integer, c As Integer
     Dim pro As String

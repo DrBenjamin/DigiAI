@@ -197,6 +197,7 @@ if submitted:
             summary_text = response_summary['choices'][0]['message']['content'].lstrip()
             summary_text = summary_text.replace('\n', ' ')
             input_text += " " + summary_text
+            print('ChatGPT summarization successful')
         except:
             print('ChatGPT summarization failed')
         input_text += '"""'
@@ -207,6 +208,9 @@ if submitted:
             response_keywords = openai.ChatCompletion.create(model = model, messages = [{"role": "system", "content": "You do keyword extraction."}, {"role": "user", "content": input_text},])
             keywords = response_keywords['choices'][0]['message']['content'].lstrip()
             input_keywords += ", " + keywords
+            input_keywords = set(input_keywords.split(', '))
+            input_keywords = ', '.join(input_keywords)
+            print('ChatGPT keyword extraction successful')
         except:
             print('ChatGPT keyword extraction failed')
 
