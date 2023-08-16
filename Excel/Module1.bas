@@ -81,14 +81,17 @@ Sub OpenAI_Completion()
         ' Split the completion into lines
         Dim output As Variant
         output = Split(completion, "\n")
+
+        ' MsgBox to aks for Mail template creation
         Dim Result As Integer
-        Result = MsgBox("Should an Outlook template Mail be created with this text (draft):" & vbNewLine & vbNewLine & CStr(Left(output(2), len(output(2)) - 7)), vbYesNo, "Send an Mail?")
+        Dim objShell As Object
+        Set objShell = CreateObject("Wscript.Shell")
+        Result = MsgBox("Should an Outlook template Mail be created with this text (draft):" & vbNewLine & vbNewLine & CStr(Left(output(2), len(output(2)) - 7)) & vbNewLine & vbNewLine & "Check Information on Link: " & arr_landscape(Hits, 3), vbYesNo + vbQuestion + vbMsgBoxHelpButton, "Send a Mail?")
         If Result = vbYes Then
-            Call SendMail(CStr(Left(output(2), len(output(2)) - 7)))
-        Else: 
-            Debug.Print("No Mail sending")
+            Call SendMail(text:= CStr(Left(output(2), len(output(2)) - 7)), recipients := arr_landscape(Hits, 2))
+        Else
+            Debug.Print("No Mail will be send")
         End If
-        
     Else
         MsgBox "Request failed with status " & httpRequest.Status & vbCrLf & vbCrLf & "ERROR MESSAGE:" & vbCrLf & httpRequest.responseText, vbCritical, "OpenAI Request Failed"
     End If
@@ -147,7 +150,7 @@ Function ReplaceBackslash(text As Variant) As String
     ReplaceBackslash = newText
     On Error GoTo 0
 End Function
-Sub SendMail(text As String)
+Sub SendMail(text As String, recipients As String)
     ' Send an outlook mail
     Dim olApp As Outlook.Application
     Dim olMail As Outlook.MailItem
@@ -160,7 +163,7 @@ Sub SendMail(text As String)
     
     ' Set the email properties
     With olMail
-        .To = "recipient@example.com"
+        .To = recipients
         .Subject = "Request for help on a Digitalization project"
         .Body = "Dear" & vbNewLine & vbNewLine & text & vbNewLine & vbNewLine & "Best regards" & vbNewLine & vbNewLine & "Your Digitalization Team"
         .Attachments.Add ThisWorkbook.Path & Application.PathSeparator & "Temp.jpg"

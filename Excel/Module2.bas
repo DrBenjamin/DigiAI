@@ -66,6 +66,19 @@ Sub Test()
         .StartUpPosition = 0
         .Left = Application.Left + (0.5 * Application.Width) - (0.5 * .Width)
         .Top = Application.Top + (0.5 * Application.Height) - (0.5 * .Height)
-        .Show
+        '.Show
     End With
+
+    ' Test MsgBox
+    Dim Result As Integer
+    Dim helpFile As String
+    helpFile = ThisWorkbook.Path & Application.PathSeparator & "DigiAI.chm"
+    Debug.Print helpFile
+    Shell "HH " & ThisWorkbook.Path & Application.PathSeparator & "DigiAI.chm", vbMaximizedFocus
+    Result = MsgBox(Prompt:= "Should an Outlook template Mail be created with this text (draft):" & vbNewLine & vbNewLine & "Test" & vbNewLine & vbNewLine & "Check Information on Link: https://www.benbox.org", Buttons:= vbYesNo + vbQuestion + vbMsgBoxHelpButton, Title:= "Send a Mail?", HelpFile:= helpFile, Context:= 1012)
+    If Result = vbYes Then
+        Debug.Print("Yes")
+    Else
+        Debug.Print ("No Mail will be send")
+    End If
 End Sub
