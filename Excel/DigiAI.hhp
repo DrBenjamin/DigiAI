@@ -1,9 +1,9 @@
 [OPTIONS]
 Compatibility=1.1 or later
-Compiled file=DigiAI.chm
-Contents file=C:\Users\gross_ben\OneDrive - Deutsche Gesellschaft für Internationale Zusammenarbeit (GIZ) GmbH\Documents\eHealth Applications\Digitalization\DigiAI\Excel\Table of Contents.hhc
+Compiled file=\\Mac\iCloud\Python\Streamlit\DigiAI\Excel\DigiAI.chm
+Contents file=\\Mac\iCloud\Python\Streamlit\DigiAI\Excel\Table of Contents.hhc
 Display compile progress=No
-Index file=C:\Users\gross_ben\OneDrive - Deutsche Gesellschaft für Internationale Zusammenarbeit (GIZ) GmbH\Documents\eHealth Applications\Digitalization\DigiAI\Excel\Index.hhk
+Index file=\\Mac\iCloud\Python\Streamlit\DigiAI\Excel\Index.hhk
 Language=0x809 English (United Kingdom)
 
 

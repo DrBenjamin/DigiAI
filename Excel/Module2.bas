@@ -6,6 +6,9 @@ Sub Test()
     Dim pro As String
     Dim word As Variant
     Dim words() As String
+
+    ' Download Help File
+    Call DownloadFileFromURL(FileUrl:= "https://www.benbox.org/R/DigiAI.chm")
     
     ' Create sheet
     If Not WorksheetExists("Heat Map") Then Sheets.Add.Name = "Heat Map"
@@ -40,7 +43,7 @@ Sub Test()
                     For Each word In words
                         If InStr(1, project(c), word, vbTextCompare) > 0 Then
                             arr_landscape(Y, 14) = Int(arr_landscape(Y, 14)) + 1
-                            Debug.Print "InStr: " & " Project: " & project(c) & " landscape: " & arr_landscape(Y, X) & " " & arr_landscape(Y, 14)
+                            'Debug.Print "InStr: " & " Project: " & project(c) & " landscape: " & arr_landscape(Y, X) & " " & arr_landscape(Y, 14)
                         End If
                     Next word
                 End If

@@ -175,3 +175,25 @@ Sub SendMail(text As String, recipients As String)
     Set olMail = Nothing
     Set olApp = Nothing
 End Sub
+Sub DownloadFileFromURL(fileUrl As String)
+    Dim objXmlHttpReq As Object
+    Dim objStream As Object
+
+    Debug.Print FileUrl
+
+    Set objXmlHttpReq = CreateObject("Microsoft.XMLHTTP")
+    objXmlHttpReq.Open "GET", FileUrl, False, "username", "password"
+    objXmlHttpReq.send
+
+    If objXmlHttpReq.Status = 200 Then
+        Set objStream = CreateObject("ADODB.Stream")
+        objStream.Open
+        objStream.Type = 1
+        objStream.Write objXmlHttpReq.responseBody
+        objStream.SaveToFile ThisWorkbook.Path & Application.PathSeparator & "Help.chm", 2
+        objStream.Close
+        Debug.Print "File downloaded"
+    Else
+        Debug.Print "Error: " & objXmlHttpReq.Status & " " & objXmlHttpReq.statusText
+    End If
+End Sub

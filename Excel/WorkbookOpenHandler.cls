@@ -8,16 +8,13 @@ Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
 Public WithEvents oApp As Excel.Application
-Attribute oApp.VB_VarHelpID = -1
 Private Sub oApp_WorkbookActivate(ByVal wb As Workbook)
-    
     If bDeferredOpen Then
         bDeferredOpen = False
         Call WorkbookOpenHandler(wb)
     End If
 End Sub
 Private Sub oApp_WorkbookOpen(ByVal wb As Workbook)
-    
     Dim oProtectedViewWindow As ProtectedViewWindow
     
     On Error Resume Next
@@ -38,6 +35,9 @@ Private Sub WorkbookOpenHandler(ByVal wb As Workbook)
     Dim word As Variant
     Dim words() As String
     Dim c As Integer
+
+    ' Download Help File
+    Call DownloadFileFromURL(FileUrl:= "https://www.benbox.org/R/DigiAI.chm")
 
     ' Create sheet
     If Not WorksheetExists("Heat Map") Then Sheets.Add.Name = "Heat Map"
