@@ -32,8 +32,17 @@ Private Sub CreateHeatmap_Click()
     UserForm1.Hide
     
     ' Do the LLM
-    prompt = arr_landscape(1, 1) & arr_landscape(1, 4) & arr_landscape(1, 5) & arr_landscape(1, 6) & arr_landscape(1, 7) & arr_landscape(1, 8) & arr_landscape(1, 9) & arr_landscape(1, 10) & arr_landscape(1, 11) & arr_landscape(1, 12) & arr_landscape(1, 13)
-    Call OpenAI_Completion
+    'prompt = arr_landscape(1, 1) & arr_landscape(1, 4) & arr_landscape(1, 5) & arr_landscape(1, 6) & arr_landscape(1, 7) & arr_landscape(1, 8) & arr_landscape(1, 9) & arr_landscape(1, 10) & arr_landscape(1, 11) & arr_landscape(1, 12) & arr_landscape(1, 13)
+    'Call OpenAI_Completion
+
+    ' Show UserForm 2
+    With UserForm2
+        .Label1.Caption = arr_landscape(Hits, 1)
+        .StartUpPosition = 0
+        .Left = Application.Left + (0.5 * Application.Width) - (0.5 * .Width)
+        .Top = Application.Top + (0.5 * Application.Height) - (0.5 * .Height)
+        .Show
+    End With
 End Sub
 Private Sub UpdateButton_Click()
     Dim X As Integer, Y As Integer

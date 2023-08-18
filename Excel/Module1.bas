@@ -3,6 +3,7 @@ Option Explicit
 Public bDeferredOpen As Boolean
 Public OpenHandler As WorkbookOpenHandler
 Public Const HANDLER_ENABLED = True
+Public Const INTERNET_FLAG_NO_CACHE_WRITE = &H4000000
 Const API_KEY As String = "K3iE2nh1Rex94RBUPj0wJFkblB3TS6XPtImSpgzGyscKcAwH"
 Const API_ENDPOINT As String = "https://api.openai.com/v1/completions"
 Const MODELL As String = "text-davinci-003"
@@ -14,6 +15,7 @@ Global sentence As String
 Global project() As String
 Global Hits As Integer
 Global arr_len As Integer
+Global output As Variant
 Function RangeToString(ByVal myRange As Range) As String
     RangeToString = ""
     If Not myRange Is Nothing Then
@@ -79,19 +81,18 @@ Sub OpenAI_Completion()
         completion = ParseResponse(response)
         
         ' Split the completion into lines
-        Dim output As Variant
         output = Split(completion, "\n")
 
         ' MsgBox to aks for Mail template creation
         Dim Result As Integer
         Dim objShell As Object
         Set objShell = CreateObject("Wscript.Shell")
-        Result = MsgBox("Should an Outlook template Mail be created with this text (draft):" & vbNewLine & vbNewLine & CStr(Left(output(2), len(output(2)) - 7)) & vbNewLine & vbNewLine & "Check Information on Link: " & arr_landscape(Hits, 3), vbYesNo + vbQuestion + vbMsgBoxHelpButton, "Send a Mail?")
-        If Result = vbYes Then
-            Call SendMail(text:= CStr(Left(output(2), len(output(2)) - 7)), recipients := arr_landscape(Hits, 2))
-        Else
-            Debug.Print("No Mail will be send")
-        End If
+        With UserForm2
+            .StartUpPosition = 0
+            .Left = Application.Left + (0.5 * Application.Width) - (0.5 * .Width)
+            .Top = Application.Top + (0.5 * Application.Height) - (0.5 * .Height)
+            .Show
+        End With
     Else
         MsgBox "Request failed with status " & httpRequest.Status & vbCrLf & vbCrLf & "ERROR MESSAGE:" & vbCrLf & httpRequest.responseText, vbCritical, "OpenAI Request Failed"
     End If
@@ -175,10 +176,27 @@ Sub SendMail(text As String, recipients As String)
     Set olMail = Nothing
     Set olApp = Nothing
 End Sub
+Sub ClearCached()
+Application.ScreenUpdating = False
+    Dim originalSetting As Long
+
+    Shell "RunDll32.exe InetCpl.Cpl, ClearMyTracksByProcess 2"
+
+    'Browsing_History
+    Shell "RunDll32.exe InetCpl.Cpl, ClearMyTracksByProcess 8"
+    originalSetting = Application.RecentFiles.Maximum
+    Application.RecentFiles.Maximum = 0
+    Application.RecentFiles.Maximum = originalSetting
+    Debug.Print "Cache cleared"
+End Sub
 Sub DownloadFileFromURL(fileUrl As String)
     Dim objXmlHttpReq As Object
     Dim objStream As Object
 
+    ' Clear cache
+    Call ClearCached()
+
+    ' Print url
     Debug.Print FileUrl
 
     Set objXmlHttpReq = CreateObject("Microsoft.XMLHTTP")
@@ -190,7 +208,7 @@ Sub DownloadFileFromURL(fileUrl As String)
         objStream.Open
         objStream.Type = 1
         objStream.Write objXmlHttpReq.responseBody
-        objStream.SaveToFile ThisWorkbook.Path & Application.PathSeparator & "Help.chm", 2
+        objStream.SaveToFile ThisWorkbook.Path & Application.PathSeparator & "DigiAI.chm", 2 ' 2 = overwriting existing files
         objStream.Close
         Debug.Print "File downloaded"
     Else

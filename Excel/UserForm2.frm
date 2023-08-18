@@ -16,6 +16,18 @@ Attribute VB_Exposed = False
 Option Explicit
 Private Sub CommandButton1_Click()
     Dim helpFile As String
-    helpFile = ThisWorkbook.Path & Application.PathSeparator & "Help.chm::/about.htm"
+    helpFile = ThisWorkbook.Path & Application.PathSeparator & "DigiAI.chm::/Html/about.htm" 'e.g. DigiAI.chm::/Html/Initiatives/Make-IT Initiative/index.htm
     Shell "HH " & helpFile, vbMaximizedFocus
+End Sub
+Private Sub CommandButton2_Click()
+    'Call SendMail(text:= CStr(Left(output(2), len(output(2)) - 7)), recipients:= arr_landscape(Hits, 2))
+    Call SendMail(text:= "[Mail text...]", recipients:= arr_landscape(Hits, 2))
+End Sub
+Private Sub Label1_Click()
+    On Error GoTo NoCanDo
+    ActiveWorkbook.FollowHyperlink Address:= arr_landscape(Hits, 3), NewWindow:= True
+    Unload Me
+Exit Sub
+NoCanDo:
+    Debug.Print "Can't open " & arr_landscape(Hits, 3)
 End Sub
