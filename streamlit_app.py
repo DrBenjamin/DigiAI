@@ -35,11 +35,9 @@ if 'font_color' not in st.session_state:
 def check_password():
     # Session states
     if ("username" not in st.session_state):
-        st.session_state["username"] = ''
+        st.session_state["username"] = 'giz'
     if ("password" not in st.session_state):
         st.session_state["password"] = ''
-    if ("admin" not in st.session_state):
-        st.session_state["admin"] = False
     if ("password_correct" not in st.session_state):
         st.session_state["password_correct"] = False
     if ('logout' not in st.session_state):
@@ -48,20 +46,8 @@ def check_password():
     # Checks whether a password entered by the user is correct
     def password_entered():
         try:
-            if st.session_state["username"] in st.secrets["passwords"] and st.session_state["password"] == st.secrets["passwords"][
-                st.session_state["username"]]:
+            if st.session_state["username"] in st.secrets["passwords"] and st.session_state["password"] == st.secrets["passwords"][st.session_state["username"]]:
                 st.session_state["password_correct"] = True
-                st.session_state["admin"] = False
-                
-                # Delete username + password
-                del st.session_state["password"]
-                del st.session_state["username"]
-            
-            # Checks whether a password entered by the user is correct for admins
-            elif st.session_state["username"] in st.secrets["admins"] and st.session_state["password"] == st.secrets["admins"][
-                st.session_state["username"]]:
-                st.session_state["password_correct"] = True
-                st.session_state["admin"] = True
                 
                 # Delete username + password
                 del st.session_state["password"]
@@ -74,26 +60,23 @@ def check_password():
             print('Exception in `password_entered` function. Error: ', e)
             st.session_state["password_correct"] = False
     
+
     ## Sidebar
     st.sidebar.header('Digitalization Advisor')
-    # Show Sidebar Header Image
-    #st.sidebar.image('Images/Africa_Digitalization.jpg', use_column_width = True)
     
     # First run, show inputs for username + password
     if "password_correct" not in st.session_state:
-        st.sidebar.subheader('Please enter username and password')
-        st.sidebar.text_input(label = "Username", on_change = password_entered, key = "username")
+        st.sidebar.subheader('Please enter One-Time-Password (OTP)')
         st.sidebar.text_input(label = "OTP", type = "password", on_change = password_entered, key = "password")
         return False
     
     # Password not correct, show input + error
     elif not st.session_state["password_correct"]:
-        st.sidebar.text_input(label = "Username", on_change = password_entered, key = "username")
         st.sidebar.text_input(label = "OTP", type = "password", on_change = password_entered, key = "password")
         if (st.session_state['logout']):
             st.sidebar.success('Logout successful!', icon = "✅")
         else:
-            st.sidebar.error(body = "User not known or OTP incorrect!", icon = "🚨")
+            st.sidebar.error(body = "OTP incorrect!", icon = "🚨")
         return False
     
     else:
@@ -199,8 +182,7 @@ def export_excel(sheet, data, sheet2, keywords, sheet3, landscape, excel_file_na
         writer.close()
 
         # Download Button
-        st.download_button(label = 'Download Excel document', data = buffer, file_name = excel_file_name,
-                           mime = "application/vnd.ms-excel.sheet.macroEnabled.12")
+        st.download_button(label = 'Download Excel document', data = buffer, file_name = excel_file_name, mime = "application/vnd.ms-excel.sheet.macroEnabled.12")
 
 
 
@@ -277,20 +259,21 @@ if check_password():
                         
             # Doing the requests to OpenAI for summarizing
             model = 'gpt-3.5-turbo'
-            try:
-                # Creating summary of user question
-                response_summary = openai.ChatCompletion.create(model = model, messages = [{"role": "system", "content": "You do summarization."}, {"role": "user", "content": reader_text[:3000]},])
-                summary_text = response_summary['choices'][0]['message']['content'].lstrip()
-                summary_text = summary_text.replace('\n', ' ')
-                input_text += " " + summary_text
-                print('ChatGPT summarization successful')
-            except:
-                print('ChatGPT summarization failed')
-            input_text += '"""'
+            # try:
+            #     # Creating summary of user question
+            #     response_summary = openai.ChatCompletion.create(model = model, messages = [{"role": "system", "content": "You do summarization."}, {"role": "user", "content": reader_text[:3000]},])
+            #     summary_text = response_summary['choices'][0]['message']['content'].lstrip()
+            #     summary_text = summary_text.replace('\n', ' ')
+            #     input_text += " " + summary_text
+            #     print('ChatGPT summarization successful')
+            # except:
+            #     print('ChatGPT summarization failed')
+            # input_text += '"""'
 
             # Doing the requests to OpenAI for keyword extracting
             try:
                 # Extracting keywords
+                input_text += " " + reader_text[:3000] + '"""'
                 response_keywords = openai.ChatCompletion.create(model = model, messages = [{"role": "system", "content": "You do keyword extraction."}, {"role": "user", "content": input_text},])
                 keywords = response_keywords['choices'][0]['message']['content'].lstrip()
                 input_keywords += ", " + keywords
@@ -305,6 +288,5 @@ if check_password():
             extract_macro()
             export_excel(sheet = 'Project description', data = pd.DataFrame([input_text]), sheet2 = 'Project keywords', keywords = pd.DataFrame([input_keywords]), sheet3 = 'Digital landscape GIZ', landscape = import_excel(excel_file_name = 'Excel/Digital_Landscape_GIZ_List_' + st.session_state['version'] + '.xlsx'), image = Image.open(excel_image))
         st.toast("Your Excel document is ready for download.", icon = "👍")
-        st.balloons()
 else:
-    st.info("Please enter your username and password on the left side.", icon = "🔒")
+    st.info("Please enter your One-Time-Password (OTP) on the left side.", icon = "🔒")
