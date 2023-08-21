@@ -225,7 +225,7 @@ if check_password():
     for file in filez:
         if file[:27] == 'Digital_Landscape_GIZ_List_' and file[-5:] == '.xlsx':
             versions.append(file[27:31])
-    st.session_state['version'] = st.selectbox(label = "Which Digital landscape GIZ file version should be used?", options = versions, index = len(versions) - 1, disabled = False)
+    st.session_state['version'] = st.selectbox(label = "Which Digital Landscape GIZ file version should be used?", options = versions, index = len(versions) - 1, disabled = False)
 
     # Upload Wallpaper image
     uploaded_file = st.file_uploader(label = 'Do you want to upload a customized Wallpaper?', type = 'jpg')
@@ -242,13 +242,13 @@ if check_password():
 
     # User Input
     input_text = '"""'
-    input_text += st.text_area("What is your digitalization project about?")
+    input_text += st.text_area("What is your digitalization project about?", placeholder = "NO project numbers, names, mail adresses, phone numbers and confidential information!")
     st.warning("NO confidential information, as data will be processed by OpenAI!", icon = "🔥")
     input_keywords = ''
-    input_keywords = st.text_area("What are the keywords of your digitalization project?")
+    input_keywords = st.text_area("What are the keywords of your digitalization project?", placeholder = "NO project numbers, names, mail adresses, phone numbers and confidential information!")
 
     # Upload PDF file
-    uploaded_file = st.file_uploader(label = 'Do you want to upload a PDF file with more information about your project?', type = 'pdf')
+    uploaded_file = st.file_uploader(label = 'Do you want to upload a PDF file with unconfidential / public information?', type = 'pdf')
     if uploaded_file is not None:
         file_name = os.path.join('PDFs', uploaded_file.name)
         file = open(file_name, 'wb')
@@ -305,5 +305,6 @@ if check_password():
             extract_macro()
             export_excel(sheet = 'Project description', data = pd.DataFrame([input_text]), sheet2 = 'Project keywords', keywords = pd.DataFrame([input_keywords]), sheet3 = 'Digital landscape GIZ', landscape = import_excel(excel_file_name = 'Excel/Digital_Landscape_GIZ_List_' + st.session_state['version'] + '.xlsx'), image = Image.open(excel_image))
         st.toast("Your Excel document is ready for download.", icon = "👍")
+        st.balloons()
 else:
     st.info("Please enter your username and password on the left side.", icon = "🔒")
