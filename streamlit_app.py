@@ -21,6 +21,7 @@ from PIL import Image
 
 
 #### Session states
+## Session states
 if 'version' not in st.session_state:
     st.session_state['version'] = 'V1.0'
 if 'font_color' not in st.session_state:
@@ -30,6 +31,90 @@ if 'font_color' not in st.session_state:
 
 
 #### Functions
+### Function: check_password = Password / user checking
+def check_password():
+    # Session states
+    if ("username" not in st.session_state):
+        st.session_state["username"] = ''
+    if ("password" not in st.session_state):
+        st.session_state["password"] = ''
+    if ("admin" not in st.session_state):
+        st.session_state["admin"] = False
+    if ("password_correct" not in st.session_state):
+        st.session_state["password_correct"] = False
+    if ('logout' not in st.session_state):
+        st.session_state['logout'] = False
+    
+    # Checks whether a password entered by the user is correct
+    def password_entered():
+        try:
+            if st.session_state["username"] in st.secrets["passwords"] and st.session_state["password"] == st.secrets["passwords"][
+                st.session_state["username"]]:
+                st.session_state["password_correct"] = True
+                st.session_state["admin"] = False
+                
+                # Delete username + password
+                del st.session_state["password"]
+                del st.session_state["username"]
+            
+            # Checks whether a password entered by the user is correct for admins
+            elif st.session_state["username"] in st.secrets["admins"] and st.session_state["password"] == st.secrets["admins"][
+                st.session_state["username"]]:
+                st.session_state["password_correct"] = True
+                st.session_state["admin"] = True
+                
+                # Delete username + password
+                del st.session_state["password"]
+                del st.session_state["username"]
+            
+            # No combination fits
+            else:
+                st.session_state["password_correct"] = False
+        except Exception as e:
+            print('Exception in `password_entered` function. Error: ', e)
+            st.session_state["password_correct"] = False
+    
+    ## Sidebar
+    st.sidebar.header('Digitalization Advisor')
+    # Show Sidebar Header Image
+    st.sidebar.image('Images/Africa_Digitalization.jpg', use_column_width = True)
+    
+    # First run, show inputs for username + password
+    if "password_correct" not in st.session_state:
+        st.sidebar.subheader('Please enter username and password')
+        st.sidebar.text_input(label = "Username", on_change = password_entered, key = "username")
+        st.sidebar.text_input(label = "OTP", type = "password", on_change = password_entered, key = "password")
+        return False
+    
+    # Password not correct, show input + error
+    elif not st.session_state["password_correct"]:
+        st.sidebar.text_input(label = "Username", on_change = password_entered, key = "username")
+        st.sidebar.text_input(label = "OTP", type = "password", on_change = password_entered, key = "password")
+        if (st.session_state['logout']):
+            st.sidebar.success('Logout successful!', icon = "✅")
+        else:
+            st.sidebar.error(body = "User not known or OTP incorrect!", icon = "🚨")
+        return False
+    
+    else:
+        # Password correct
+        st.sidebar.success(body = ' You are logged in.', icon = "✅")
+        st.sidebar.info(body = ' You can close this menu now.', icon = '☝🏾️')
+        st.sidebar.button(label = 'Logout', on_click = logout)
+        return True
+
+
+
+### Funtion: logout = Logout button
+def logout():
+    # Set `logout` to get logout-message
+    st.session_state['logout'] = True
+    
+    # Set password to `false`
+    st.session_state["password_correct"] = False
+
+
+
 ### Function: extract_macro = Extract VBA code from MS Excel document (xlsm)
 def extract_macro(xlsm_file = 'Excel/Digital_Landscape_GIZ.xlsm', vba_filename = 'vbaProject.bin'):
     try:
@@ -121,101 +206,104 @@ def export_excel(sheet, data, sheet2, keywords, sheet3, landscape, excel_file_na
 
 
 #### Main App
-st.header("Digitalization Advisor")
-st.subheader('Get help to find support in GIZ for your digitalization project')
-st.write("Welcome to the Digitalization Advisor. This tool will help you to identify the best digitalization initiatives in GIZ to support your individual project. Please answer the following questions to get started.")
+if check_password():
+    st.header("Digitalization Advisor")
+    st.subheader('Get help to find support in GIZ for your digitalization project')
+    st.write("Welcome to the Digitalization Advisor. This tool will help you to identify the best digitalization initiatives in GIZ to support your individual project. Please answer the following questions to get started.")
 
-# Upload Excel file
-uploaded_file = st.file_uploader(label = 'Do you want to upload a new Digital landscape GIZ file version?', type = 'xlsx')
-if uploaded_file is not None:
-    file_name = os.path.join('Excel', uploaded_file.name)
-    file = open(file_name, 'wb')
-    file.write(uploaded_file.getvalue())
-    file.close()
+    # Upload Excel file
+    uploaded_file = st.file_uploader(label = 'Do you want to upload a new Digital landscape GIZ file version?', type = 'xlsx')
+    if uploaded_file is not None:
+        file_name = os.path.join('Excel', uploaded_file.name)
+        file = open(file_name, 'wb')
+        file.write(uploaded_file.getvalue())
+        file.close()
 
-# Get a list of files in a folder
-filez = os.listdir('Excel/')
-versions = []
-for file in filez:
-    if file[:27] == 'Digital_Landscape_GIZ_List_' and file[-5:] == '.xlsx':
-        versions.append(file[27:31])
-st.session_state['version'] = st.selectbox(label = "Which Digital landscape GIZ file version should be used?", options = versions, index = len(versions) - 1, disabled = False)
+    # Get a list of files in a folder
+    filez = os.listdir('Excel/')
+    versions = []
+    for file in filez:
+        if file[:27] == 'Digital_Landscape_GIZ_List_' and file[-5:] == '.xlsx':
+            versions.append(file[27:31])
+    st.session_state['version'] = st.selectbox(label = "Which Digital landscape GIZ file version should be used?", options = versions, index = len(versions) - 1, disabled = False)
 
-# Upload Wallpaper image
-uploaded_file = st.file_uploader(label = 'Do you want to upload a customized Wallpaper?', type = 'jpg')
-if uploaded_file is not None:
-    file_name = os.path.join('Images', uploaded_file.name)
-    file = open(file_name, 'wb')
-    file.write(uploaded_file.getvalue())
-    file.close()
-    excel_image = file_name
-    st.session_state['font_color'] = st.selectbox(label = "Which font color should be used?", options = ['Black', 'White'])
+    # Upload Wallpaper image
+    uploaded_file = st.file_uploader(label = 'Do you want to upload a customized Wallpaper?', type = 'jpg')
+    if uploaded_file is not None:
+        file_name = os.path.join('Images', uploaded_file.name)
+        file = open(file_name, 'wb')
+        file.write(uploaded_file.getvalue())
+        file.close()
+        excel_image = file_name
+        st.session_state['font_color'] = st.selectbox(label = "Which font color should be used?", options = ['Black', 'White'])
+    else:
+        excel_image = 'Images/Wallpaper.jpg'
+        st.session_state['font_color'] = 'White'
+
+    # User Input
+    input_text = '"""'
+    input_text += st.text_area("What is your digitalization project about?")
+    st.warning("NO confidential information, as data will be processed by OpenAI!", icon = "🔥")
+    input_keywords = ''
+    input_keywords = st.text_area("What are the keywords of your digitalization project?")
+
+    # Upload PDF file
+    uploaded_file = st.file_uploader(label = 'Do you want to upload a PDF file with more information about your project?', type = 'pdf')
+    if uploaded_file is not None:
+        file_name = os.path.join('PDFs', uploaded_file.name)
+        file = open(file_name, 'wb')
+        file.write(uploaded_file.getvalue())
+        file.close()
+    st.warning("NO confidential document, as data will be processed by OpenAI!", icon = "🔥")
+        
+    # Extact text from PDF document
+    try:
+        reader = PyPDF2.PdfReader(file_name)
+        reader_text = ""
+        for i in range(len(reader.pages)):
+            reader_text += reader.pages[i].extract_text()
+        reader_text = reader_text.replace('\n', ' ')
+    except:
+        print('No PDF file uploaded')
+
+    # Download Excel file
+    submitted = st.button("Submit")
+    if submitted:
+        st.write("Thank you for your submission.")
+        with st.spinner('Wait for your Excel document...'):
+            ## Using ChatGPT from OpenAI to shorten PDF extracted text
+            # Set API key
+            openai.api_key = st.secrets['openai']['key']
+                        
+            # Doing the requests to OpenAI for summarizing
+            model = 'gpt-3.5-turbo'
+            try:
+                # Creating summary of user question
+                response_summary = openai.ChatCompletion.create(model = model, messages = [{"role": "system", "content": "You do summarization."}, {"role": "user", "content": reader_text[:3000]},])
+                summary_text = response_summary['choices'][0]['message']['content'].lstrip()
+                summary_text = summary_text.replace('\n', ' ')
+                input_text += " " + summary_text
+                print('ChatGPT summarization successful')
+            except:
+                print('ChatGPT summarization failed')
+            input_text += '"""'
+
+            # Doing the requests to OpenAI for keyword extracting
+            try:
+                # Extracting keywords
+                response_keywords = openai.ChatCompletion.create(model = model, messages = [{"role": "system", "content": "You do keyword extraction."}, {"role": "user", "content": input_text},])
+                keywords = response_keywords['choices'][0]['message']['content'].lstrip()
+                input_keywords += ", " + keywords
+                input_keywords = set(input_keywords.split(', '))
+                input_keywords = ', '.join(input_keywords)
+                print('ChatGPT keyword extraction successful')
+            except:
+                print('ChatGPT keyword extraction failed')
+
+
+            ## Export Excel file
+            extract_macro()
+            export_excel(sheet = 'Project description', data = pd.DataFrame([input_text]), sheet2 = 'Project keywords', keywords = pd.DataFrame([input_keywords]), sheet3 = 'Digital landscape GIZ', landscape = import_excel(excel_file_name = 'Excel/Digital_Landscape_GIZ_List_' + st.session_state['version'] + '.xlsx'), image = Image.open(excel_image))
+        st.toast("Your Excel document is ready for download.", icon = "👍")
 else:
-    excel_image = 'Images/Wallpaper.jpg'
-    st.session_state['font_color'] = 'White'
-
-# User Input
-input_text = '"""'
-input_text += st.text_area("What is your digitalization project about?")
-input_keywords = ''
-input_keywords = st.text_area("What are the keywords of your digitalization project?")
-st.write("... you can also upload a describing PDF file (in addition to the information above)")
-
-# Upload PDF file
-uploaded_file = st.file_uploader(label = 'Do you want to upload a PDF file with more information about your project?', type = 'pdf')
-if uploaded_file is not None:
-    file_name = os.path.join('PDFs', uploaded_file.name)
-    file = open(file_name, 'wb')
-    file.write(uploaded_file.getvalue())
-    file.close()
-st.info("Be aware of Data Privacy", icon = "🔥")
-    
-# Extact text from PDF document
-try:
-    reader = PyPDF2.PdfReader(file_name)
-    reader_text = ""
-    for i in range(len(reader.pages)):
-        reader_text += reader.pages[i].extract_text()
-    reader_text = reader_text.replace('\n', ' ')
-except:
-    print('No PDF file uploaded')
-
-# Download Excel file
-submitted = st.button("Submit")
-if submitted:
-    st.write("Thank you for your submission.")
-    with st.spinner('Wait for your Excel document...'):
-        ## Using ChatGPT from OpenAI to shorten PDF extracted text
-        # Set API key
-        openai.api_key = st.secrets['openai']['key']
-                    
-        # Doing the requests to OpenAI for summarizing
-        model = 'gpt-3.5-turbo'
-        try:
-            # Creating summary of user question
-            response_summary = openai.ChatCompletion.create(model = model, messages = [{"role": "system", "content": "You do summarization."}, {"role": "user", "content": reader_text[:3000]},])
-            summary_text = response_summary['choices'][0]['message']['content'].lstrip()
-            summary_text = summary_text.replace('\n', ' ')
-            input_text += " " + summary_text
-            print('ChatGPT summarization successful')
-        except:
-            print('ChatGPT summarization failed')
-        input_text += '"""'
-
-        # Doing the requests to OpenAI for keyword extracting
-        try:
-            # Extracting keywords
-            response_keywords = openai.ChatCompletion.create(model = model, messages = [{"role": "system", "content": "You do keyword extraction."}, {"role": "user", "content": input_text},])
-            keywords = response_keywords['choices'][0]['message']['content'].lstrip()
-            input_keywords += ", " + keywords
-            input_keywords = set(input_keywords.split(', '))
-            input_keywords = ', '.join(input_keywords)
-            print('ChatGPT keyword extraction successful')
-        except:
-            print('ChatGPT keyword extraction failed')
-
-
-        ## Export Excel file
-        extract_macro()
-        export_excel(sheet = 'Project description', data = pd.DataFrame([input_text]), sheet2 = 'Project keywords', keywords = pd.DataFrame([input_keywords]), sheet3 = 'Digital landscape GIZ', landscape = import_excel(excel_file_name = 'Excel/Digital_Landscape_GIZ_List_' + st.session_state['version'] + '.xlsx'), image = Image.open(excel_image))
-    st.toast("Your Excel document is ready for download.", icon = "👍")
+    st.info("Please enter your username and password on the left side.", icon = "🔒")
