@@ -77,7 +77,7 @@ def check_password():
     ## Sidebar
     st.sidebar.header('Digitalization Advisor')
     # Show Sidebar Header Image
-    st.sidebar.image('Images/Africa_Digitalization.jpg', use_column_width = True)
+    #st.sidebar.image('Images/Africa_Digitalization.jpg', use_column_width = True)
     
     # First run, show inputs for username + password
     if "password_correct" not in st.session_state:
