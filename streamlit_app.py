@@ -89,8 +89,6 @@ def write_sheet(sheet = 0, data = []):
 ### Function: check_password = OTP checking
 def check_password(data):
     # Session states
-    if ("username" not in st.session_state):
-        st.session_state["username"] = 'giz'
     if ("password" not in st.session_state):
         st.session_state["password"] = ''
     if ("password_correct" not in st.session_state):
@@ -101,7 +99,7 @@ def check_password(data):
     # Checks whether an OTP entered is correct
     def password_entered():
         try:
-            if st.session_state["username"] in st.secrets["passwords"] and st.session_state["password"] in otps:
+            if st.session_state["password"] in otps:
                 st.session_state["password_correct"] = True
             
             # No combination fits
