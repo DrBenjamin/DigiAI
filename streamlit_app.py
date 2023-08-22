@@ -257,7 +257,7 @@ otps = read_sheet(sheet = 0)
                     
 # Creating numpy array
 otps = np.array(otps)
-st.sidebar.write(otps)
+
 
 
 ### OTP secured app
