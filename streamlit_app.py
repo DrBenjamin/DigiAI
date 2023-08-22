@@ -55,8 +55,39 @@ def google_sheet_credentials():
 
 
 
+### Function read_sheet = Read data from Google Sheet
+@st.cache_data
+def read_sheet(sheet = 0):
+    wks = sh[sheet]
+    try:
+        data = wks.get_as_df()
+    except Exception as e:
+        print('Exception in read of Google Sheet', e)
+    return data
+
+
+
+### Function write_sheet = Write data to Google Sheet
+def write_sheet(sheet = 0, data = []):
+    wks = sh[sheet]
+            
+    # Converting numby array to list
+    data = data.tolist()
+            
+    # Writing to worksheet
+    try:
+        wks.delete_rows(2, 151)
+        wks.append_table(data, start = 'A1', end = None, dimension = 'COLUMNS', overwrite = True)
+        read_sheet.clear()
+        print('Updated Google Sheet')
+
+    except Exception as e:
+        print('No Update to Google Sheet', e)
+
+
+
 ### Function: check_password = OTP checking
-def check_password():
+def check_password(data):
     # Session states
     if ("username" not in st.session_state):
         st.session_state["username"] = 'giz'
@@ -70,11 +101,8 @@ def check_password():
     # Checks whether an OTP entered is correct
     def password_entered():
         try:
-            if st.session_state["username"] in st.secrets["passwords"] and st.session_state["password"] == st.secrets["passwords"][st.session_state["username"]]:
+            if st.session_state["username"] in st.secrets["passwords"] and st.session_state["password"] in otps:
                 st.session_state["password_correct"] = True
-                
-                # Delete OTP
-                del st.session_state["password"]
             
             # No combination fits
             else:
@@ -104,6 +132,9 @@ def check_password():
     
     # OTP correct
     else:
+        otps_to_be_removed = [st.session_state["password"]]
+        new_data = np.setdiff1d(data, otps_to_be_removed)
+        write_sheet(sheet = 0, data = new_data)
         st.sidebar.success(body = ' You are logged in.', icon = "✅")
         st.sidebar.info(body = ' You can close this menu now.', icon = '☝🏾️')
         st.sidebar.button(label = 'Logout', on_click = logout)
@@ -222,43 +253,17 @@ print('Opened Google Sheet: ', sh)
 
 # Read Google Sheet
 worksheet = sh.sheet1
-print('Opened Google Sheet: ', worksheet)
-
-# Get all values from the first column
-list_of_lists = worksheet.get_all_values()
-print('Read Google Sheet: ', list_of_lists)
 
 # Read worksheet first to add data
-data = read_sheet()
+otps = read_sheet(sheet = 0)
                     
 # Creating numpy array
-data = np.array(data)
-for d in data:
-    if d[1][0:1] != "'+":
-        d[1] = d[1].replace("+", "'+")
-
-        # Add data to existing
-        newrow = np.array([name, phone, mail, duty_loc, duty_place, duty_comment, str(date_start), str(date_end)])
-        data = np.vstack((data, newrow))
-            
-        # Converting numby array to list
-        data = data.tolist()
-            
-        # Writing to worksheet
-        try:
-            wks = sh[0]
-            wks.update_values(crange = 'A2', values = data)
-            st.session_state['google'] = True
-            read_sheet.clear()
-            print('Updated Google Sheet')
-            st.info(body = 'Data successfully submitted!', icon = "✅")
-        except Exception as e:
-            print('No Update to Google Sheet', e)
+otps = np.array(otps)
 
 
 
 ### OTP secured app
-if check_password():
+if check_password(data = otps):
     st.header("Digitalization Advisor")
     st.subheader('Get help to find support in GIZ for your digitalization project')
     st.write("Welcome to the Digitalization Advisor. This tool will help you to identify the best digitalization initiatives in GIZ to support your individual project. Please answer the following questions to get started.")
@@ -315,8 +320,8 @@ if check_password():
         for i in range(len(reader.pages)):
             reader_text += reader.pages[i].extract_text()
         reader_text = reader_text.replace('\n', ' ')
-    except:
-        print('No PDF file uploaded')
+    except Exception as e:
+        print('No PDF file uploaded', e)
 
     # Download Excel file
     submitted = st.button("Submit")
@@ -325,21 +330,26 @@ if check_password():
         with st.spinner('Wait for your Excel document...'):
             ## Using ChatGPT from OpenAI to shorten PDF extracted text
             # Set API key
-            openai.api_key = st.secrets['openai']['key']
+            api_key = read_sheet(sheet = 1)
+            openai.api_key = api_key.iloc[0,0]
             model = 'gpt-3.5-turbo'
 
             # Doing the requests to OpenAI for keyword extracting
             try:
                 # Extracting keywords
-                input_text += " " + reader_text[:3000] + '"""'
+                try:
+                    input_text += " " + reader_text[:3000] 
+                except:
+                    print('No PDF file uploaded')
+                input_text += '"""'
                 response_keywords = openai.ChatCompletion.create(model = model, messages = [{"role": "system", "content": "You do keyword extraction."}, {"role": "user", "content": input_text},])
                 keywords = response_keywords['choices'][0]['message']['content'].lstrip()
                 input_keywords += ", " + keywords
                 input_keywords = set(input_keywords.split(', '))
                 input_keywords = ', '.join(input_keywords)
                 print('ChatGPT keyword extraction successful')
-            except:
-                print('ChatGPT keyword extraction failed')
+            except Exception as e:
+                print('ChatGPT keyword extraction failed', e)
 
 
             ## Export Excel file

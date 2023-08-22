@@ -168,3 +168,4 @@ cython_debug/
 #.idea/
 Excel/Help.chm
 Excel/DigiAI.chm
+google_credentials.json
