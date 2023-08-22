@@ -73,13 +73,21 @@ def write_sheet(sheet = 0, data = []):
             
     # Converting numby array to list
     data = data.tolist()
-            
+
+    # Delete all rows if data is not empty
+    try:
+        if (len(data) > 0):
+            wks.delete_rows(2, 151)
+            data_deleted = True
+    except Exception as e:
+        print('Exception in delete of Google Sheet', e)
+
     # Writing to worksheet
     try:
-        wks.delete_rows(2, 151)
-        wks.append_table(data, start = 'A1', end = None, dimension = 'COLUMNS', overwrite = True)
-        read_sheet.clear()
-        print('Updated Google Sheet')
+        if data_deleted:
+            wks.append_table(data, start = 'A1', end = None, dimension = 'COLUMNS', overwrite = True)
+            read_sheet.clear()
+            print('Updated Google Sheet')
 
     except Exception as e:
         print('No Update to Google Sheet', e)
