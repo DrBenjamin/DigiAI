@@ -10,6 +10,10 @@ import sys
 from zipfile import ZipFile
 from zipfile import BadZipfile
 import pandas as pd
+import numpy as np
+from google_drive_downloader import GoogleDriveDownloader
+import pygsheets
+import shutil
 import openai
 import xlsxwriter
 import openpyxl
@@ -31,7 +35,27 @@ if 'font_color' not in st.session_state:
 
 
 #### Functions
-### Function: check_password = Password / user checking
+### google_sheet_credentials = Get google credentials file
+@st.cache_resource
+def google_sheet_credentials():
+    ## Google Sheet API authorization
+    output = st.secrets['google']['credentials_file']
+    GoogleDriveDownloader.download_file_from_google_drive(file_id = st.secrets['google']['credentials_file_id'],
+                                                          dest_path = './rhd_credentials.zip', unzip = True)
+    client = pygsheets.authorize(service_file = st.secrets['google']['credentials_file'])
+    if os.path.exists("rhd_credentials.zip"):
+        os.remove("rhd_credentials.zip")
+    if os.path.exists("rhd_credentials.json"):
+        os.remove("rhd_credentials.json")
+    if os.path.exists("__MACOSX"):
+        shutil.rmtree("__MACOSX")
+
+    # Return client
+    return client
+
+
+
+### Function: check_password = OTP checking
 def check_password():
     # Session states
     if ("username" not in st.session_state):
@@ -43,15 +67,14 @@ def check_password():
     if ('logout' not in st.session_state):
         st.session_state['logout'] = False
     
-    # Checks whether a password entered by the user is correct
+    # Checks whether an OTP entered is correct
     def password_entered():
         try:
             if st.session_state["username"] in st.secrets["passwords"] and st.session_state["password"] == st.secrets["passwords"][st.session_state["username"]]:
                 st.session_state["password_correct"] = True
                 
-                # Delete username + password
+                # Delete OTP
                 del st.session_state["password"]
-                del st.session_state["username"]
             
             # No combination fits
             else:
@@ -64,13 +87,13 @@ def check_password():
     ## Sidebar
     st.sidebar.header('Digitalization Advisor')
     
-    # First run, show inputs for username + password
+    # First run, show inputs for OTP
     if "password_correct" not in st.session_state:
-        st.sidebar.subheader('Please enter One-Time-Password (OTP)')
+        st.sidebar.subheader('Please enter one-time password (OTP)')
         st.sidebar.text_input(label = "OTP", type = "password", on_change = password_entered, key = "password")
         return False
     
-    # Password not correct, show input + error
+    # OTP not correct, show input + error
     elif not st.session_state["password_correct"]:
         st.sidebar.text_input(label = "OTP", type = "password", on_change = password_entered, key = "password")
         if (st.session_state['logout']):
@@ -79,8 +102,8 @@ def check_password():
             st.sidebar.error(body = "OTP incorrect!", icon = "🚨")
         return False
     
+    # OTP correct
     else:
-        # Password correct
         st.sidebar.success(body = ' You are logged in.', icon = "✅")
         st.sidebar.info(body = ' You can close this menu now.', icon = '☝🏾️')
         st.sidebar.button(label = 'Logout', on_click = logout)
@@ -188,6 +211,53 @@ def export_excel(sheet, data, sheet2, keywords, sheet3, landscape, excel_file_na
 
 
 #### Main App
+### Google Sheets
+## Open the spreadsheet and the first sheet
+# Getting credentials
+client = google_sheet_credentials()
+
+# Opening sheet
+sh = client.open_by_key(st.secrets['google']['spreadsheet_id'])
+print('Opened Google Sheet: ', sh)
+
+# Read Google Sheet
+worksheet = sh.sheet1
+print('Opened Google Sheet: ', worksheet)
+
+# Get all values from the first column
+list_of_lists = worksheet.get_all_values()
+print('Read Google Sheet: ', list_of_lists)
+
+# Read worksheet first to add data
+data = read_sheet()
+                    
+# Creating numpy array
+data = np.array(data)
+for d in data:
+    if d[1][0:1] != "'+":
+        d[1] = d[1].replace("+", "'+")
+
+        # Add data to existing
+        newrow = np.array([name, phone, mail, duty_loc, duty_place, duty_comment, str(date_start), str(date_end)])
+        data = np.vstack((data, newrow))
+            
+        # Converting numby array to list
+        data = data.tolist()
+            
+        # Writing to worksheet
+        try:
+            wks = sh[0]
+            wks.update_values(crange = 'A2', values = data)
+            st.session_state['google'] = True
+            read_sheet.clear()
+            print('Updated Google Sheet')
+            st.info(body = 'Data successfully submitted!', icon = "✅")
+        except Exception as e:
+            print('No Update to Google Sheet', e)
+
+
+
+### OTP secured app
 if check_password():
     st.header("Digitalization Advisor")
     st.subheader('Get help to find support in GIZ for your digitalization project')
@@ -256,19 +326,7 @@ if check_password():
             ## Using ChatGPT from OpenAI to shorten PDF extracted text
             # Set API key
             openai.api_key = st.secrets['openai']['key']
-                        
-            # Doing the requests to OpenAI for summarizing
             model = 'gpt-3.5-turbo'
-            # try:
-            #     # Creating summary of user question
-            #     response_summary = openai.ChatCompletion.create(model = model, messages = [{"role": "system", "content": "You do summarization."}, {"role": "user", "content": reader_text[:3000]},])
-            #     summary_text = response_summary['choices'][0]['message']['content'].lstrip()
-            #     summary_text = summary_text.replace('\n', ' ')
-            #     input_text += " " + summary_text
-            #     print('ChatGPT summarization successful')
-            # except:
-            #     print('ChatGPT summarization failed')
-            # input_text += '"""'
 
             # Doing the requests to OpenAI for keyword extracting
             try:
@@ -289,4 +347,4 @@ if check_password():
             export_excel(sheet = 'Project description', data = pd.DataFrame([input_text]), sheet2 = 'Project keywords', keywords = pd.DataFrame([input_keywords]), sheet3 = 'Digital landscape GIZ', landscape = import_excel(excel_file_name = 'Excel/Digital_Landscape_GIZ_List_' + st.session_state['version'] + '.xlsx'), image = Image.open(excel_image))
         st.toast("Your Excel document is ready for download.", icon = "👍")
 else:
-    st.info("Please enter your One-Time-Password (OTP) on the left side.", icon = "🔒")
+    st.info("Please enter your one-time password (OTP) on the left side.", icon = "🔒")
