@@ -15,9 +15,6 @@ from google_drive_downloader import GoogleDriveDownloader
 import pygsheets
 import shutil
 import openai
-import xlsxwriter
-import openpyxl
-import xlrd
 import PyPDF2
 from PIL import Image
 
