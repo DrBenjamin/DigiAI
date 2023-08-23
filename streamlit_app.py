@@ -79,7 +79,7 @@ def write_sheet(sheet = 0, data = []):
     # Delete all rows if data is not empty
     try:
         if (len(data) > 0):
-            wks.clear('A2', 'A151')
+            wks.clear('A1', 'A150')
             data_deleted = True
     except Exception as e:
         print('Exception in delete of Google Sheet', e)
