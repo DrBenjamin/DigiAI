@@ -13,7 +13,6 @@ import pandas as pd
 import numpy as np
 from google_drive_downloader import GoogleDriveDownloader
 import pygsheets
-import shutil
 import openai
 import PyPDF2
 from PIL import Image

@@ -10,8 +10,5 @@ pygsheets
 googledrivedownloader
 xlwings==0.30.10
 opencv-python-headless
-xlsxwriter
-openpyxl
-xlrd
 openai
 PyPDF2
