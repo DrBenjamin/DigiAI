@@ -84,7 +84,8 @@ def write_sheet(sheet = 0, data = []):
     # Writing to worksheet
     try:
         if data_deleted:
-            wks.append_table(data, start = '1', end = None, dimension = 'COLUMNS', overwrite = True)
+            #wks.append_table(data, start = '1', end = None, dimension = 'COLUMNS', overwrite = True)
+            wks.insert_cols(0, number = len(data), values = data, inherit = False)
             print('Updated Google Sheet')
 
     except Exception as e:
