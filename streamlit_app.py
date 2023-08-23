@@ -73,18 +73,22 @@ def write_sheet(sheet = 0, data = []):
     # Converting numpy array to list
     data = data.tolist()
 
+    # Converting numpy array to matrix
+    data = [data]
+
     # Delete all rows if data is not empty
     try:
         if (len(data) > 0):
             wks.clear('1', '150')
             data_deleted = True
+            print('Deleted Google Sheet data')
     except Exception as e:
-        print('Exception in delete of Google Sheet', e)
+        print('Exception in delete of Google Sheet data', e)
 
     # Writing to worksheet
     try:
         if data_deleted:
-            wks.insert_cols(col = 0, number = len(data), values = data, inherit = False)
+            wks.update_values(crange = 'A1', values = data, majordim = 'COLUMNS')
             print('Updated Google Sheet')
 
     except Exception as e:
