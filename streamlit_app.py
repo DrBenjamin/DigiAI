@@ -56,7 +56,6 @@ def google_sheet_credentials():
 
 
 ### Function read_sheet = Read data from Google Sheet
-@st.cache_data
 def read_sheet(sheet = 0):
     wks = sh[sheet]
     try:
