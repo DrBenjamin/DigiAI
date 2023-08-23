@@ -72,14 +72,11 @@ def write_sheet(sheet = 0, data = []):
             
     # Converting numpy array to list
     data = data.tolist()
-    print(type(data))
-    print(len(data))
-    print(data)
 
     # Delete all rows if data is not empty
     try:
         if (len(data) > 0):
-            wks.clear('A1', 'A150')
+            wks.clear('1', '150')
             data_deleted = True
     except Exception as e:
         print('Exception in delete of Google Sheet', e)
