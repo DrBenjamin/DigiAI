@@ -59,10 +59,10 @@ def google_sheet_credentials():
 def read_sheet(sheet = 0):
     wks = sh[sheet]
     try:
-        data = wks.get_as_df()
+        data = wks.get_as_df(has_header = False)
+        return data
     except Exception as e:
         print('Exception in read of Google Sheet', e)
-    return data
 
 
 
@@ -70,13 +70,16 @@ def read_sheet(sheet = 0):
 def write_sheet(sheet = 0, data = []):
     wks = sh[sheet]
             
-    # Converting numby array to list
+    # Converting numpy array to list
     data = data.tolist()
+    print(type(data))
+    print(len(data))
+    print(data)
 
     # Delete all rows if data is not empty
     try:
         if (len(data) > 0):
-            wks.delete_rows(2, 151)
+            wks.clear('A2', 'A151')
             data_deleted = True
     except Exception as e:
         print('Exception in delete of Google Sheet', e)
@@ -84,8 +87,7 @@ def write_sheet(sheet = 0, data = []):
     # Writing to worksheet
     try:
         if data_deleted:
-            #wks.append_table(data, start = '1', end = None, dimension = 'COLUMNS', overwrite = True)
-            wks.insert_cols(0, number = len(data), values = data, inherit = False)
+            wks.insert_cols(col = 0, number = len(data), values = data, inherit = False)
             print('Updated Google Sheet')
 
     except Exception as e:
@@ -137,8 +139,8 @@ def check_password(data):
     
     # OTP correct
     else:
-        otps_to_be_removed = [st.session_state["password"]]
-        new_data = np.setdiff1d(data, otps_to_be_removed)
+        new_data = np.setdiff1d(data, [st.session_state["password"]][0])
+        new_data = np.delete(new_data, np.where(new_data == ''))
         write_sheet(sheet = 0, data = new_data)
         st.sidebar.success(body = ' You are logged in.', icon = "✅")
         st.sidebar.info(body = ' You can close this menu now.', icon = '☝🏾️')
