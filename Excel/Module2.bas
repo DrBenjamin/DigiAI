@@ -6,6 +6,7 @@ Sub Test()
     Dim pro As String
     Dim word As Variant
     Dim words() As String
+    Dim coeff As Double
 
     ' Download Help File
     Call DownloadFileFromURL(FileUrl:= "https://www.benbox.org/R/DigiAI.chm")
@@ -61,7 +62,42 @@ Sub Test()
     Debug.Print "Position: " & Hits & " Initiative: " & arr_landscape(Hits, 1) & " Value: " & arr_landscape(Hits, 14)
     
     ' Create HeatMap
-    
+    For Y = 1 To 51
+        For X = 1 To 13
+            'Worksheets("Heat Map").Cells(Y, X).Value = arr_landscape(Y, X)
+        Next X
+        With Worksheets("Heat Map") 
+            .Hyperlinks.Add Anchor:=.Cells(Y, 1), Address:= arr_landscape(Y, 3), ScreenTip:= arr_landscape(Y, 1), TextToDisplay:= arr_landscape(Y, 1)
+        End With
+        Worksheets("Heat Map").Cells(Y, 1).Interior.Color = RGB(255, 255, 204)
+        Debug.Print(arr_landscape(Y, 14))
+        If arr_landscape(Hits, 14) > 20 Then 
+            coeff = arr_landscape(Hits, 14) / 20
+        Else
+            coeff = 1.0
+        End If
+        If arr_landscape(Y, 14) > 0 and arr_landscape(Y, 14) <= (2 * coeff) Then
+            Worksheets("Heat Map").Cells(Y, 1).Interior.Color = RGB(255, 255, 204)
+        ElseIf arr_landscape(Y, 14) > (2 * coeff) and arr_landscape(Y, 14) <= (4 * coeff) Then
+            Worksheets("Heat Map").Cells(Y, 1).Interior.Color = RGB(255, 255, 153)
+        ElseIf arr_landscape(Y, 14) > (4 * coeff) and arr_landscape(Y, 14) <= (6 * coeff) Then
+            Worksheets("Heat Map").Cells(Y, 1).Interior.Color = RGB(255, 255, 102)
+        ElseIf arr_landscape(Y, 14) > (6 * coeff) and arr_landscape(Y, 14) <= (8 * coeff) Then
+            Worksheets("Heat Map").Cells(Y, 1).Interior.Color = RGB(255, 255, 51)
+        ElseIf arr_landscape(Y, 14) > (8 * coeff) and arr_landscape(Y, 14) <= (10 * coeff) Then
+            Worksheets("Heat Map").Cells(Y, 1).Interior.Color = RGB(255, 255, 0)
+        ElseIf arr_landscape(Y, 14) > (10 * coeff) and arr_landscape(Y, 14) <= (12 * coeff) Then
+            Worksheets("Heat Map").Cells(Y, 1).Interior.Color = RGB(255, 204, 0)
+        ElseIf arr_landscape(Y, 14) > (12 * coeff) and arr_landscape(Y, 14) <= (14 * coeff) Then
+            Worksheets("Heat Map").Cells(Y, 1).Interior.Color = RGB(255, 153, 0)
+        ElseIf arr_landscape(Y, 14) > (14 * coeff) and arr_landscape(Y, 14) <= (16 * coeff) Then
+            Worksheets("Heat Map").Cells(Y, 1).Interior.Color = RGB(255, 102, 0)
+        ElseIf arr_landscape(Y, 14) > (16 * coeff) and arr_landscape(Y, 14) <= (18 * coeff) Then
+            Worksheets("Heat Map").Cells(Y, 1).Interior.Color = RGB(255, 51, 0)
+        ElseIf arr_landscape(Y, 14) > (18 * coeff) Then
+            Worksheets("Heat Map").Cells(Y, 1).Interior.Color = RGB(255, 0, 0)
+        End If
+    Next Y
 
     ' Show UserForm
     With UserForm2
