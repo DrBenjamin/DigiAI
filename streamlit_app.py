@@ -14,8 +14,8 @@ import numpy as np
 from google_drive_downloader import GoogleDriveDownloader
 import shutil
 import pygsheets
-import openpyxl
-import xlsxwriter
+import openpyxl # needed!
+import xlsxwriter # needed!
 import openai
 import PyPDF2
 from PIL import Image
@@ -341,7 +341,7 @@ if check_password():
     submitted = st.button("Submit")
     if submitted:
         st.write("Thank you for your submission.")
-        with st.spinner('Wait for your Excel document...'):
+        with st.spinner("Your Excel document get's ready..."):
             ## Using ChatGPT from OpenAI to shorten PDF extracted text
             # Set key
             openai.api_key = st.secrets['openai']['key']
