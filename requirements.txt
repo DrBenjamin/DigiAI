@@ -8,6 +8,7 @@ pandas
 numpy
 pygsheets
 openpyxl
+xlsxwriter
 googledrivedownloader
 xlwings==0.30.10
 opencv-python-headless
