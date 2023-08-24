@@ -341,9 +341,10 @@ if check_password():
         st.write("Thank you for your submission.")
         with st.spinner('Wait for your Excel document...'):
             ## Using ChatGPT from OpenAI to shorten PDF extracted text
-            # Set API key
-            api_key = read_sheet(sheet = 1)
-            openai.api_key = api_key.iloc[0,0]
+            # Set key
+            openai.api_key = st.secrets['openai']['key']
+
+            # Set model
             model = 'gpt-3.5-turbo'
 
             # Doing the requests to OpenAI for keyword extracting

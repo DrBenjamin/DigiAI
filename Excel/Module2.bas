@@ -68,9 +68,9 @@ Sub Test()
         Next X
         With Worksheets("Heat Map") 
             .Hyperlinks.Add Anchor:=.Cells(Y, 1), Address:= arr_landscape(Y, 3), ScreenTip:= arr_landscape(Y, 1), TextToDisplay:= arr_landscape(Y, 1)
+            .Cells(Y, 1).ColumnWidth = 80
         End With
         Worksheets("Heat Map").Cells(Y, 1).Interior.Color = RGB(255, 255, 204)
-        Debug.Print(arr_landscape(Y, 14))
         If arr_landscape(Hits, 14) > 20 Then 
             coeff = arr_landscape(Hits, 14) / 20
         Else
@@ -96,6 +96,8 @@ Sub Test()
             Worksheets("Heat Map").Cells(Y, 1).Interior.Color = RGB(255, 51, 0)
         ElseIf arr_landscape(Y, 14) > (18 * coeff) Then
             Worksheets("Heat Map").Cells(Y, 1).Interior.Color = RGB(255, 0, 0)
+        Else
+            Worksheets("Heat Map").Cells(Y, 1).Interior.Color = RGB(255, 255, 255)
         End If
     Next Y
 

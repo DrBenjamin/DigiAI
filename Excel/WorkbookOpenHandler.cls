@@ -41,6 +41,13 @@ Private Sub WorkbookOpenHandler(ByVal wb As Workbook)
 
     ' Create sheet
     If Not WorksheetExists("Heat Map") Then Sheets.Add.Name = "Heat Map"
+    If Not WorksheetExists("Project description") Then Sheets.Add.Name = "Project description"
+    If Not WorksheetExists("Project keywords") Then Sheets.Add.Name = "Project keywords"
+    If Not WorksheetExists("Digital landscape GIZ") Then Sheets.Add.Name = "Digital landscape GIZ"
+    If Not WorksheetExists("Wallpaper") Then Sheets.Add.Name = "Wallpaper"
+    
+    ' Show Sheet Heat Map
+    Worksheets("Heat Map").Visible = True
     
     ' Hide sheets
     Worksheets("Project description").Visible = False
