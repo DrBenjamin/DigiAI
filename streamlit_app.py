@@ -12,6 +12,7 @@ from zipfile import BadZipfile
 import pandas as pd
 import numpy as np
 from google_drive_downloader import GoogleDriveDownloader
+import shutil
 import pygsheets
 import openai
 import PyPDF2
@@ -85,16 +86,16 @@ def write_sheet(sheet = 0, data = []):
     try:
         if data_deleted:
             wks.update_values(crange = 'A1', values = data, majordim = 'COLUMNS')
-            print('Updated Google Sheet')
+            print('Updated Google Sheet data')
 
     except Exception as e:
-        print('No Update to Google Sheet', e)
+        print('Exception in update of Google Sheet data', e)
 
 
 
 ### Function: check_password = OTP checking
-def check_password(data):
-    # Session states
+def check_password():
+    ## Session states
     if ("password" not in st.session_state):
         st.session_state["password"] = ''
     if ("password_correct" not in st.session_state):
@@ -102,8 +103,19 @@ def check_password(data):
     if ('logout' not in st.session_state):
         st.session_state['logout'] = False
     
+    
+    ## OTP checking
+    def otp_receiving():
+        # Read Google Sheet worksheet first to get otps
+        otps = read_sheet(sheet = 0)
+                    
+        # Creating numpy array
+        otps = np.array(otps)
+        return otps
+
     # Checks whether an OTP entered is correct
     def password_entered():
+        # Search for OTP in list
         try:
             if st.session_state["password"] in otps:
                 st.session_state["password_correct"] = True
@@ -118,6 +130,9 @@ def check_password(data):
 
     ## Sidebar
     st.sidebar.header('Digitalization Advisor')
+    
+    # Get OTPs
+    otps = otp_receiving()
     
     # First run, show inputs for OTP
     if "password_correct" not in st.session_state:
@@ -136,9 +151,12 @@ def check_password(data):
     
     # OTP correct
     else:
-        new_data = np.setdiff1d(data, [st.session_state["password"]][0])
+        # Remove OPT in Google Sheets
+        new_data = np.setdiff1d(otps, [st.session_state["password"]][0])
         new_data = np.delete(new_data, np.where(new_data == ''))
         write_sheet(sheet = 0, data = new_data)
+
+        # Update sidebar
         st.sidebar.success(body = ' You are logged in.', icon = "✅")
         st.sidebar.info(body = ' You can close this menu now.', icon = '☝🏾️')
         st.sidebar.button(label = 'Logout', on_click = logout)
@@ -247,27 +265,17 @@ def export_excel(sheet, data, sheet2, keywords, sheet3, landscape, excel_file_na
 
 #### Main App
 ### Google Sheets
-## Open the spreadsheet and the first sheet
 # Getting credentials
 client = google_sheet_credentials()
 
-# Opening sheet
+# Opening Google Sheet
 sh = client.open_by_key(st.secrets['google']['spreadsheet_id'])
 print('Opened Google Sheet: ', sh)
-
-# Read Google Sheet
-worksheet = sh.sheet1
-
-# Read worksheet first to add data
-otps = read_sheet(sheet = 0)
-                    
-# Creating numpy array
-otps = np.array(otps)
 
 
 
 ### OTP secured app
-if check_password(data = otps):
+if check_password():
     st.header("Digitalization Advisor")
     st.subheader('Get help to find support in GIZ for your digitalization project')
     st.write("Welcome to the Digitalization Advisor. This tool will help you to identify the best digitalization initiatives in GIZ to support your individual project. Please answer the following questions to get started.")
