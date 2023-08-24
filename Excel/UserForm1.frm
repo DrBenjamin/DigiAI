@@ -26,9 +26,10 @@ Private Sub CreateHeatmap_Click()
     ' Create HeatMap
     For Y = 1 To 51
         col = Int(Y Mod 2) + 1
+        row = Int((Y + 1) / 2)
         With Worksheets("Heat Map") 
-            .Hyperlinks.Add Anchor:= .Cells(Y, col), Address:= arr_landscape(Y, 3), ScreenTip:= arr_landscape(Y, 1), TextToDisplay:= arr_landscape(Y, 1)
-            .Cells(Y, col).ColumnWidth = 80
+            .Hyperlinks.Add Anchor:= .Cells(row, col), Address:= arr_landscape(Y, 3), ScreenTip:= arr_landscape(Y, 1), TextToDisplay:= arr_landscape(Y, 1)
+            .Cells(row, col).ColumnWidth = 80
         End With
 
         If arr_landscape(Hits, 14) > 20 Then 
@@ -38,27 +39,27 @@ Private Sub CreateHeatmap_Click()
         End If
 
         If arr_landscape(Y, 14) > 0 and arr_landscape(Y, 14) <= (2 * coeff) Then
-            Worksheets("Heat Map").Cells(Y, col).Interior.Color = RGB(255, 255, 204)
+            Worksheets("Heat Map").Cells(row, col).Interior.Color = RGB(255, 255, 204)
         ElseIf arr_landscape(Y, 14) > (2 * coeff) and arr_landscape(Y, 14) <= (4 * coeff) Then
-            Worksheets("Heat Map").Cells(Y, col).Interior.Color = RGB(255, 255, 153)
+            Worksheets("Heat Map").Cells(row, col).Interior.Color = RGB(255, 255, 153)
         ElseIf arr_landscape(Y, 14) > (4 * coeff) and arr_landscape(Y, 14) <= (6 * coeff) Then
-            Worksheets("Heat Map").Cells(Y, col).Interior.Color = RGB(255, 255, 102)
+            Worksheets("Heat Map").Cells(row, col).Interior.Color = RGB(255, 255, 102)
         ElseIf arr_landscape(Y, 14) > (6 * coeff) and arr_landscape(Y, 14) <= (8 * coeff) Then
-            Worksheets("Heat Map").Cells(Y, col).Interior.Color = RGB(255, 255, 51)
+            Worksheets("Heat Map").Cells(row, col).Interior.Color = RGB(255, 255, 51)
         ElseIf arr_landscape(Y, 14) > (8 * coeff) and arr_landscape(Y, 14) <= (10 * coeff) Then
-            Worksheets("Heat Map").Cells(Y, col).Interior.Color = RGB(255, 255, 0)
+            Worksheets("Heat Map").Cells(row, col).Interior.Color = RGB(255, 255, 0)
         ElseIf arr_landscape(Y, 14) > (10 * coeff) and arr_landscape(Y, 14) <= (12 * coeff) Then
-            Worksheets("Heat Map").Cells(Y, col).Interior.Color = RGB(255, 204, 0)
+            Worksheets("Heat Map").Cells(row, col).Interior.Color = RGB(255, 204, 0)
         ElseIf arr_landscape(Y, 14) > (12 * coeff) and arr_landscape(Y, 14) <= (14 * coeff) Then
-            Worksheets("Heat Map").Cells(Y, col).Interior.Color = RGB(255, 153, 0)
+            Worksheets("Heat Map").Cells(row, col).Interior.Color = RGB(255, 153, 0)
         ElseIf arr_landscape(Y, 14) > (14 * coeff) and arr_landscape(Y, 14) <= (16 * coeff) Then
-            Worksheets("Heat Map").Cells(Y, col).Interior.Color = RGB(255, 102, 0)
+            Worksheets("Heat Map").Cells(row, col).Interior.Color = RGB(255, 102, 0)
         ElseIf arr_landscape(Y, 14) > (16 * coeff) and arr_landscape(Y, 14) <= (18 * coeff) Then
-            Worksheets("Heat Map").Cells(Y, col).Interior.Color = RGB(255, 51, 0)
+            Worksheets("Heat Map").Cells(row, col).Interior.Color = RGB(255, 51, 0)
         ElseIf arr_landscape(Y, 14) > (18 * coeff) Then
-            Worksheets("Heat Map").Cells(Y, col).Interior.Color = RGB(255, 0, 0)
+            Worksheets("Heat Map").Cells(row, col).Interior.Color = RGB(255, 0, 0)
         Else
-            Worksheets("Heat Map").Cells(Y, col).Interior.Color = RGB(255, 255, 255)
+            Worksheets("Heat Map").Cells(row, col).Interior.Color = RGB(255, 255, 255)
         End If
     Next Y
 
