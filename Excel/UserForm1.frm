@@ -20,6 +20,7 @@ Private Sub CreateHeatmap_Click()
     Dim dataRange As Range
     Dim chartRange As Range
     Dim chartObj As ChartObject
+    Dim coeff As Double
     
     ' Create HeatMap
     For Y = 1 To 51
