@@ -63,6 +63,11 @@ Private Sub CreateHeatmap_Click()
             Worksheets("Heat Map").Cells(row, col).Interior.Color = RGB(255, 255, 255)
         End If
     Next Y
+        With Worksheets("Heat Map").Range("A1:B" & row).Borders
+        .LineStyle = xlContinuous
+        .Weight = xlThick
+        .ColorIndex = xlAutomatic
+    End With
 
     ' Hide UserForm
     UserForm1.Hide

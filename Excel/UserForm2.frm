@@ -42,12 +42,10 @@ Private Sub UserForm_Activate()
         .Label2.BackStyle = fmBackStyleTransparent
         .Label3.BackStyle = fmBackStyleTransparent
         If Worksheets("Wallpaper").Range("A2").Value = "White" Then
-            .Label1.ForeColor = vbWhite
             .Label2.ForeColor = vbWhite
             .Label3.ForeColor = vbWhite
         End If
         If Worksheets("Wallpaper").Range("A2").Value = "Black" Then
-            .Label1.ForeColor = vbBlack
             .Label2.ForeColor = vbBlack
             .Label3.ForeColor = vbBlack
         End If
