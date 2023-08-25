@@ -197,7 +197,7 @@ Private Sub UserForm_Activate()
         If Y < 51 Then Ans = Ans & "; " & vbNewLine
     Next Y
     
-    ' UserForm
+    ' UserForm 1
     With UserForm1
         .TextBox = Ans
         .TextBox.TextAlign = fmTextAlignCenter

@@ -351,7 +351,6 @@ if check_password():
 
             # Doing the requests to OpenAI for keyword extracting
             try:
-                # Extracting keywords
                 try:
                     input_text += " " + reader_text[:3000] 
                 except:

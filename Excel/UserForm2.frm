@@ -31,3 +31,25 @@ Exit Sub
 NoCanDo:
     Debug.Print "Can't open " & arr_landscape(Hits, 3)
 End Sub
+Private Sub UserForm_Initialize()
+    ' Load custom image
+    Me.Image.Picture = LoadPicture(ThisWorkbook.Path & "\Temp.jpg")
+End Sub
+Private Sub UserForm_Activate()
+    ' UserForm 2
+    With UserForm2
+        .Label1.BackStyle = fmBackStyleTransparent
+        .Label2.BackStyle = fmBackStyleTransparent
+        .Label3.BackStyle = fmBackStyleTransparent
+        If Worksheets("Wallpaper").Range("A2").Value = "White" Then
+            .Label1.ForeColor = vbWhite
+            .Label2.ForeColor = vbWhite
+            .Label3.ForeColor = vbWhite
+        End If
+        If Worksheets("Wallpaper").Range("A2").Value = "Black" Then
+            .Label1.ForeColor = vbBlack
+            .Label2.ForeColor = vbBlack
+            .Label3.ForeColor = vbBlack
+        End If
+    End With
+End Sub
