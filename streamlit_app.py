@@ -341,7 +341,7 @@ if check_password():
     submitted = st.button("Submit")
     if submitted:
         st.write("Thank you for your submission.")
-        with st.spinner("Your Excel document is getting ready..."):
+        with st.spinner("Your Excel document is being baked..."):
             ## Using ChatGPT from OpenAI to shorten PDF extracted text
             # Set key
             openai.api_key = st.secrets['openai']['key']
