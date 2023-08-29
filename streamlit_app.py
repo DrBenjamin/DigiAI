@@ -280,7 +280,7 @@ print('Opened Google Sheet: ', sh)
 if check_password():
     st.header("Digitalization Advisor")
     st.subheader('Get help to find support in GIZ for your digitalization project')
-    st.write("Welcome to the Digitalization Advisor. This tool will help you to identify digitalization initiatives in GIZ which could support your individual digitalization project. Please answer the following questions to get started.")
+    st.write("Welcome to the Digitalization Advisor. This tool will help you to identify possible digitalization initiatives in GIZ to support your individual project. Please answer the following questions to get started.")
 
     # Upload Excel file
     uploaded_file = st.file_uploader(label = 'Do you want to upload a new Digital landscape GIZ file version?', type = 'xlsx')
@@ -316,7 +316,7 @@ if check_password():
     input_text += st.text_area("What is your digitalization project about?", placeholder = "NO project numbers, names, mail adresses, phone numbers and confidential information!")
     st.warning("NO confidential information, as data will be processed by OpenAI!", icon = "🔥")
     input_keywords = ''
-    input_keywords = st.text_area("What are the keywords of your digitalization project?", placeholder = "NO project numbers, names, mail adresses, phone numbers and confidential information!")
+    input_keywords = st.text_area("What are the keywords of your digitalization project? (optional)", placeholder = "NO project numbers, names, mail adresses, phone numbers and confidential information!")
 
     # Upload PDF file
     uploaded_file = st.file_uploader(label = 'Do you want to upload a PDF file with unconfidential / public information?', type = 'pdf')
@@ -341,7 +341,7 @@ if check_password():
     submitted = st.button("Submit")
     if submitted:
         st.write("Thank you for your submission.")
-        with st.spinner("Your Excel document is getting ready..."):
+        with st.spinner("Your Excel document is being baked..."):
             ## Using ChatGPT from OpenAI to shorten PDF extracted text
             # Set key
             openai.api_key = st.secrets['openai']['key']
@@ -356,15 +356,12 @@ if check_password():
                 except:
                     print('No PDF file uploaded')
                 input_text += '"""'
-                if input_text != '""""""':
-                    response_keywords = openai.ChatCompletion.create(model = model, messages = [{"role": "system", "content": "You do keyword extraction."}, {"role": "user", "content": input_text},])
-                    keywords = response_keywords['choices'][0]['message']['content'].lstrip()
-                    input_keywords += ", " + keywords
-                    input_keywords = set(input_keywords.split(', '))
-                    input_keywords = ', '.join(input_keywords)
-                    print('ChatGPT keyword extraction successful')
-                else:
-                    print('ChatGPT keyword extraction skipped')
+                response_keywords = openai.ChatCompletion.create(model = model, messages = [{"role": "system", "content": "You do keyword extraction."}, {"role": "user", "content": input_text},])
+                keywords = response_keywords['choices'][0]['message']['content'].lstrip()
+                input_keywords += ", " + keywords
+                input_keywords = set(input_keywords.split(', '))
+                input_keywords = ', '.join(input_keywords)
+                print('ChatGPT keyword extraction successful')
             except Exception as e:
                 print('ChatGPT keyword extraction failed', e)
 
