@@ -280,7 +280,7 @@ print('Opened Google Sheet: ', sh)
 if check_password():
     st.header("Digitalization Advisor")
     st.subheader('Get help to find support in GIZ for your digitalization project')
-    st.write("Welcome to the Digitalization Advisor. This tool will help you to identify the best digitalization initiatives in GIZ to support your individual project. Please answer the following questions to get started.")
+    st.write("Welcome to the Digitalization Advisor. This tool will help you to identify digitalization initiatives in GIZ which could support your individual digitalization project. Please answer the following questions to get started.")
 
     # Upload Excel file
     uploaded_file = st.file_uploader(label = 'Do you want to upload a new Digital landscape GIZ file version?', type = 'xlsx')
@@ -356,12 +356,15 @@ if check_password():
                 except:
                     print('No PDF file uploaded')
                 input_text += '"""'
-                response_keywords = openai.ChatCompletion.create(model = model, messages = [{"role": "system", "content": "You do keyword extraction."}, {"role": "user", "content": input_text},])
-                keywords = response_keywords['choices'][0]['message']['content'].lstrip()
-                input_keywords += ", " + keywords
-                input_keywords = set(input_keywords.split(', '))
-                input_keywords = ', '.join(input_keywords)
-                print('ChatGPT keyword extraction successful')
+                if input_text != '""""""':
+                    response_keywords = openai.ChatCompletion.create(model = model, messages = [{"role": "system", "content": "You do keyword extraction."}, {"role": "user", "content": input_text},])
+                    keywords = response_keywords['choices'][0]['message']['content'].lstrip()
+                    input_keywords += ", " + keywords
+                    input_keywords = set(input_keywords.split(', '))
+                    input_keywords = ', '.join(input_keywords)
+                    print('ChatGPT keyword extraction successful')
+                else:
+                    print('ChatGPT keyword extraction skipped')
             except Exception as e:
                 print('ChatGPT keyword extraction failed', e)
 
