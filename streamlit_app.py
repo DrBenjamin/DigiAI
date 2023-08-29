@@ -280,7 +280,7 @@ print('Opened Google Sheet: ', sh)
 if check_password():
     st.header("Digitalization Advisor")
     st.subheader('Get help to find support in GIZ for your digitalization project')
-    st.write("Welcome to the Digitalization Advisor. This tool will help you to identify possible digitalization initiatives in GIZ to support your individual project. Please answer the following questions to get started.")
+    st.write("Welcome to the Digitalization Advisor. This tool will help you to identify possible digitalization initiatives in GIZ to support your individual digitalization project. Please answer the following questions to get started.")
 
     # Upload Excel file
     uploaded_file = st.file_uploader(label = 'Do you want to upload a new Digital landscape GIZ file version?', type = 'xlsx')
