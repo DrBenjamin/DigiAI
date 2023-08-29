@@ -11,7 +11,7 @@ Sub Test()
     Dim row As Integer
 
     ' Download Help File
-    Call DownloadFileFromURL(FileUrl:= "https://www.benbox.org/R/DigiAI.chm")
+    'Call DownloadFileFromURL(FileUrl:= "https://www.benbox.org/R/DigiAI.chm")
 
     ' Create sheet
     If Not WorksheetExists("Heat Map") Then Sheets.Add.Name = "Heat Map"
