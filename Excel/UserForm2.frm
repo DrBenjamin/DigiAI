@@ -16,7 +16,7 @@ Attribute VB_Exposed = False
 Option Explicit
 Private Sub CommandButton1_Click()
     Dim helpFile As String
-    helpFile = ThisWorkbook.Path & Application.PathSeparator & "DigiAI.chm::/Html/about.htm" 'e.g. DigiAI.chm::/Html/Initiatives/Make-IT Initiative/index.htm
+    helpFile = ThisWorkbook.Path & Application.PathSeparator & "DigiAI.chm::/Html/Introduction.html" 'e.g. DigiAI.chm::/Html/Initiatives/Make-IT Initiative/index.htm
     Shell "HH " & helpFile, vbMaximizedFocus
 End Sub
 Private Sub CommandButton2_Click()
