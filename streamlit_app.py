@@ -118,23 +118,24 @@ def check_password():
     # Checks whether an OTP entered is correct
     def password_entered():
         # Search for OTP in list
-        try:
-            if st.session_state["password"] in otps:
-                st.session_state["password_correct"] = True
+        st.session_state["password_correct"] = True
+        #try:
+        #    if st.session_state["password"] in otps:
+        #        st.session_state["password_correct"] = True
             
             # No combination fits
-            else:
-                st.session_state["password_correct"] = False
-        except Exception as e:
-            print('Exception in `password_entered` function. Error: ', e)
-            st.session_state["password_correct"] = False
+        #    else:
+        #        st.session_state["password_correct"] = False
+        #except Exception as e:
+        #    print('Exception in `password_entered` function. Error: ', e)
+        #    st.session_state["password_correct"] = False
     
 
     ## Sidebar
     st.sidebar.header('Digitalization Advisor')
     
     # Get OTPs
-    otps = otp_receiving()
+    #otps = otp_receiving()
     
     # First run, show inputs for OTP
     if "password_correct" not in st.session_state:
@@ -268,11 +269,11 @@ def export_excel(sheet, data, sheet2, keywords, sheet3, landscape, excel_file_na
 #### Main App
 ### Google Sheets
 # Getting credentials
-client = google_sheet_credentials()
+#client = google_sheet_credentials()
 
 # Opening Google Sheet
-sh = client.open_by_key(st.secrets['google']['spreadsheet_id'])
-print('Opened Google Sheet: ', sh)
+#sh = client.open_by_key(st.secrets['google']['spreadsheet_id'])
+#print('Opened Google Sheet: ', sh)
 
 
 
