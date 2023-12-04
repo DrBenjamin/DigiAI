@@ -358,7 +358,6 @@ if check_password():
                          "role": "assistent", "content": "I do keyword extraction. Please give me a text and I will extract the keywords for you. I will not use more than 3 words for one keyword and will sperate them with a `,` / comma.",
                          "role": "user", "content": "Please extract keywords from this text in a comma seperated list: " + input_text,}],
                          model = "gpt-4-1106-preview",)
-                    print(keywords.choices[0].message.content)
                     input_keywords += ", " + keywords.choices[0].message.content
                     input_keywords = set(input_keywords.split(', '))
                     input_keywords = ', '.join(input_keywords)
