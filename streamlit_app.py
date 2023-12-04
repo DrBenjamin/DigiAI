@@ -155,9 +155,9 @@ def check_password():
     # OTP correct
     else:
         # Remove OPT in Google Sheets
-        new_data = np.setdiff1d(otps, [st.session_state["password"]][0])
-        new_data = np.delete(new_data, np.where(new_data == ''))
-        write_sheet(sheet = 0, data = new_data)
+        #new_data = np.setdiff1d(otps, [st.session_state["password"]][0])
+        #new_data = np.delete(new_data, np.where(new_data == ''))
+        #write_sheet(sheet = 0, data = new_data)
 
         # Update sidebar
         st.sidebar.success(body = ' You are logged in.', icon = "✅")
