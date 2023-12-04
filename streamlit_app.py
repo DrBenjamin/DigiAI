@@ -353,11 +353,11 @@ if check_password():
                 input_text += '"""'
                 if input_text != '""""""':
                     client = OpenAI(api_key = st.secrets['openai']['key'],)
-                    keywords = client.chat.completions.create(messages=[
-                        {"role": "system", "content": "You do keyword extraction. Maximum 3 words per keyword.",
-                         "role": "assistent", "content": "I do keyword extraction. Please give me a text and I will extract the keywords for you. I will not use more than 3 words for one keyword and will sperate them with a `,` / comma.",
-                         "role": "user", "content": "Please extract keywords from this text in a comma seperated list: " + input_text,}],
-                         model = "gpt-4-1106-preview",)
+                    keywords = client.chat.completions.create(messages = [
+                        {"role": "system", "content": "You are building a keyword extraction tool. The user will provide a text, and you need to extract keywords from it. Each keyword should consist of a maximum of 3 words, and they should be separated by commas."},
+                        {"role": "assistant", "content": "You are building a keyword extraction tool. Please provide a text, and I will extract the keywords for you. Each keyword should consist of a maximum of 3 words, and they should be separated by commas."},
+                        {"role": "user", "content": "Please extract keywords from the following text and provide them in a comma-separated list (witohout any explanations / notes): " + input_text}],
+                        model = "gpt-4-1106-preview")
                     input_keywords += ", " + keywords.choices[0].message.content
                     input_keywords = set(input_keywords.split(', '))
                     input_keywords = ', '.join(input_keywords)
