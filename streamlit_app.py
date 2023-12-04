@@ -16,7 +16,7 @@ import shutil
 import pygsheets
 import openpyxl # needed!
 import xlsxwriter # needed!
-import openai
+from openai import OpenAI
 import PyPDF2
 from PIL import Image
 
@@ -344,12 +344,6 @@ if check_password():
         st.write("Thank you for your submission.")
         with st.spinner("Your Excel document is being baked..."):
             ## Using ChatGPT from OpenAI to shorten PDF extracted text
-            # Set key
-            openai.api_key = st.secrets['openai']['key']
-
-            # Set model
-            model = 'gpt-3.5-turbo'
-
             # Doing the requests to OpenAI for keyword extracting
             try:
                 try:
@@ -358,9 +352,14 @@ if check_password():
                     print('No PDF file uploaded')
                 input_text += '"""'
                 if input_text != '""""""':
-                    response_keywords = openai.ChatCompletion.create(model = model, messages = [{"role": "system", "content": "You do keyword extraction."}, {"role": "user", "content": input_text},])
-                    keywords = response_keywords['choices'][0]['message']['content'].lstrip()
-                    input_keywords += ", " + keywords
+                    client = OpenAI(api_key = st.secrets['openai']['key'],)
+                    keywords = client.chat.completions.create(messages=[
+                        {"role": "system", "content": "You do keyword extraction. Maximum 3 words per keyword.",
+                         "role": "assistent", "content": "I do keyword extraction. Please give me a text and I will extract the keywords for you. I will not use more than 3 words for one keyword and will sperate them with a `,` / comma.",
+                         "role": "user", "content": "Please extract keywords from this text in a comma seperated list: " + input_text,}],
+                         model = "gpt-4-1106-preview",)
+                    print(keywords.choices[0].message.content)
+                    input_keywords += ", " + keywords.choices[0].message.content
                     input_keywords = set(input_keywords.split(', '))
                     input_keywords = ', '.join(input_keywords)
                     print('ChatGPT keyword extraction successful')
